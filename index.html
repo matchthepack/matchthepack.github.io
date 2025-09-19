@@ -518,39 +518,45 @@ function updatePairsForViewport() {
 
   const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
 
-  async function newGame(){
-     showLoading();
+async function newGame() {
+  showLoading();
   const minLoad = new Promise(r => setTimeout(r, 3000));
 
-  updatePairsForViewport(); // ← ensure selection fits current viewport
-  stopTimer(); resetStats(); winDlg.close();
+  updatePairsForViewport();
+  stopTimer();
+  resetStats();
+  winDlg.close();
   totalPairs = parseInt(pairsSel.value, 10);
-
   setGridColumns(totalPairs);
   showBest();
 
-    let images=[];
-    if(useRS.checked){
-      try{
-        const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
-        images = rsImgs.filter(x=>x && x.url);
-        if(images.length < totalPairs){
-          const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
-          images = images.concat(more);
-        }
-        images = shuffle(images).slice(0, totalPairs);
-      }catch(err){
-        console.warn('Apptegy fetch failed; using placeholders:', err);
-        images = getPlaceholderImages(totalPairs);
+  let images = [];
+  const shouldUseRS = useRS ? useRS.checked : false; // ✅ safe check
+
+  if (shouldUseRS) {
+    try {
+      const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
+      images = rsImgs.filter(x => x && x.url);
+      if (images.length < totalPairs) {
+        const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
+        images = images.concat(more);
       }
-    } else { images = getPlaceholderImages(totalPairs); }
-
-    deck = buildDeck(images, totalPairs);
-    renderDeck();
-
-    await minLoad;
-    hideLoading();
+      images = shuffle(images).slice(0, totalPairs);
+    } catch (err) {
+      console.warn('Apptegy fetch failed; using placeholders:', err);
+      images = getPlaceholderImages(totalPairs);
+    }
+  } else {
+    images = getPlaceholderImages(totalPairs);
   }
+
+  deck = buildDeck(images, totalPairs);
+  renderDeck();
+
+  await minLoad;
+  hideLoading();
+}
+
 
   newBtn.addEventListener('click', newGame, { passive:true });
   restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
