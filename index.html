@@ -124,6 +124,30 @@
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
 }
 
+/* Base link look */
+.link-control {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+}
+.link-control:hover, .link-control:focus { text-decoration: underline }
+
+/* Visibility helpers */
+.mobile-only { display: none; }
+.desktop-only { display: inline-flex; }
+
+/* Hide Pairs dropdown and show bottom links on mobile */
+@media (max-width: 640px){
+  #pairsWrap { display: none; }           /* hide the Pairs control */
+  .desktop-only { display: none; }        /* hide header links */
+  .mobile-only { display: inline-flex; }  /* show footer links */
+  .mobile-links { gap: 8px; }
+}
+
+/* (Keep your existing mobile grid/panel CSS as you fixed earlier) */
+
+
 @media (min-width: 480px){
   #loadingOverlay {
     flex-direction: row; /* side-by-side on bigger screens */
@@ -203,8 +227,8 @@
 <body>
   <header>
     <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
-    <div class="controls">
-  <label>Pairs:
+<div class="controls">
+  <label id="pairsWrap">Pairs:
     <select id="pairs">
       <option value="6">12 cards</option>
       <option value="8" selected>16 cards</option>
@@ -213,11 +237,13 @@
     </select>
   </label>
 
-  <a href="#" id="toggleStats" class="link-control mobile-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</a>
-  <a href="#" id="showHow" class="link-control mobile-only" title="How to play">❔ How to Play</a>
+  <!-- Desktop-only links in header -->
+  <a href="#" id="toggleStats" class="link-control desktop-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</a>
+  <a href="#" id="showHow" class="link-control desktop-only" title="How to play">❔ How to Play</a>
 
   <button id="newGame" class="primary">New Game</button>
 </div>
+
 
   </header>
 
@@ -239,10 +265,19 @@
     </section>
   </main>
 
-  <footer>
-    <div>How to Play: Flip cards to reveal photos and match pairs of identical images. Match all pairs to win!</div>
-    <div><a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none">↻ Restart</a></div>
-  </footer>
+ <footer>
+  <div>How to Play: Flip cards to reveal photos and match pairs of identical images. Match all pairs to win!</div>
+  <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+    <a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none">↻ Restart</a>
+
+    <!-- Mobile-only links here -->
+    <span class="mobile-links mobile-only">
+      · <a href="#" id="toggleStatsMobile" class="link-control">📊 Stats</a>
+      · <a href="#" id="showHowMobile" class="link-control">❔ How to Play</a>
+    </span>
+  </div>
+</footer>
+
 
   <dialog id="win">
     <p class="win-title">🏆 You ran with the pack!</p>
@@ -515,6 +550,25 @@ function updatePairsForViewport() {
   }
 }
 
+function isMobile() {
+  return window.matchMedia('(max-width: 640px)').matches;
+}
+
+function updatePairsForViewport() {
+  const mobile = isMobile();
+  if (!pairsSel) return;
+
+  // Limit to 6 pairs (12 cards) on mobile
+  if (mobile) {
+    // Hide in CSS, but also enforce selection
+    if (parseInt(pairsSel.value, 10) > 6) pairsSel.value = '6';
+    pairsSel.disabled = true;
+  } else {
+    pairsSel.disabled = false;
+  }
+}
+
+
 
   const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
 
@@ -573,10 +627,31 @@ window.addEventListener('DOMContentLoaded', () => {
 // 2) Re-check pair options when screen size changes
 window.addEventListener('resize', updatePairsForViewport);
 // ✅ Add this after your other event listeners
-document.getElementById('showHow').addEventListener('click', e => {
-  e.preventDefault(); // prevent page jump
+
+// Desktop header links
+document.getElementById('showHow')?.addEventListener('click', e => {
+  e.preventDefault();
   howDlg.showModal();
 });
+document.getElementById('toggleStats')?.addEventListener('click', e => {
+  e.preventDefault();
+  const on = document.body.classList.toggle('show-stats');
+  e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+});
+
+// Mobile footer links
+document.getElementById('showHowMobile')?.addEventListener('click', e => {
+  e.preventDefault();
+  howDlg.showModal();
+});
+document.getElementById('toggleStatsMobile')?.addEventListener('click', e => {
+  e.preventDefault();
+  const on = document.body.classList.toggle('show-stats');
+  e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+});
+
 
 const toggleStatsLink = document.getElementById('toggleStats');
 if (toggleStatsLink) {
