@@ -98,6 +98,42 @@
     content:""; width:28px; height:28px; margin-left:10px; border:3px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%;
     display:inline-block; animation:spin 1s linear infinite; vertical-align:middle;
   }
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.9);
+  color: #fff;
+  display: flex;
+  flex-direction: column; /* stack logo above text on phones */
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  text-align: center;
+  padding: 20px;
+}
+
+#loadingOverlay .loading-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+}
+
+@media (min-width: 480px){
+  #loadingOverlay {
+    flex-direction: row; /* side-by-side on bigger screens */
+    gap: 14px;
+  }
+  #loadingOverlay .loading-logo {
+    margin-bottom: 0;
+  }
+}
+
   @keyframes spin{ to{ transform:rotate(360deg) } }
 
   .share-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
@@ -219,7 +255,10 @@
     </div>
     <form method="dialog" style="margin-top:12px"><button class="primary">Got it</button></form>
   </dialog>
-  <div class="title"><img src="logo.png" alt="RS Wolves Logo">...Loading the pack!</div>
+    <div id="loadingOverlay">
+  <img src="logo.png" alt="RS Wolves Logo" class="loading-logo">
+  <span>Loading new game...</span>
+</div>
 
 <script>
   const LOGO_URL = 'logo.png'; // or absolute URL
