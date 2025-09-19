@@ -110,17 +110,11 @@
     header{ gap:10px }
     .controls{ width:100%; justify-content:space-between }
   }
-  @media (max-width:640px){
-    .title{ font-size: clamp(18px, 5vw, 24px) }
-    .controls{ gap:8px; flex-wrap:wrap }
-    main{ width:94vw; gap:12px }
-    .panel{ padding:12px }
-    .stats{ grid-template-columns:1fr 1fr }
-    .grid{ gap:8px }
-    footer{ font-size:13px }
-    dialog{ width:min(92vw,520px); padding:14px }
-    .win-grid{ grid-template-columns:1fr }
-  }
+  @media (max-width: 640px){
+  /* Force exactly 3 columns on mobile */
+  .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+}
+
   @media (max-width:400px){
     .grid{ grid-template-columns: repeat(auto-fit, minmax(min(30vw, 110px), 1fr)); gap:6px }
     .title{ font-size: clamp(16px, 6vw, 20px) }
@@ -457,15 +451,38 @@ if (toggleStatsBtn) {
     stopTimer();
     winDlg.showModal();
   }
+  
+  function isMobile() {
+  return window.matchMedia('(max-width: 640px)').matches;
+}
+
+// Disable pair options > 6 on mobile; re-enable on desktop
+function updatePairsForViewport() {
+  const opts = Array.from(pairsSel.options);
+  const mobile = isMobile();
+  for (const o of opts) {
+    const pairs = parseInt(o.value, 10);
+    o.disabled = mobile && pairs > 6;        // disable >6 pairs on mobile
+  }
+  // If current selection is too big for mobile, snap it to 6
+  if (mobile && parseInt(pairsSel.value, 10) > 6) {
+    pairsSel.value = '6';
+  }
+}
+
 
   const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
 
   async function newGame(){
-    showLoading();
-    const minLoad = new Promise(r => setTimeout(r, 3000)); // keep overlay visible ≥3s
-    stopTimer(); resetStats(); winDlg.close();
-    totalPairs = parseInt(pairsSel.value,10);
-    setGridColumns(totalPairs); showBest();
+     showLoading();
+  const minLoad = new Promise(r => setTimeout(r, 3000));
+
+  updatePairsForViewport(); // ← ensure selection fits current viewport
+  stopTimer(); resetStats(); winDlg.close();
+  totalPairs = parseInt(pairsSel.value, 10);
+
+  setGridColumns(totalPairs);
+  showBest();
 
     let images=[];
     if(useRS.checked){
@@ -496,7 +513,14 @@ if (toggleStatsBtn) {
   showHowBtn.addEventListener('click', ()=> howDlg.showModal());
   playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
 
-  window.addEventListener('DOMContentLoaded', newGame);
+// 1) Run both updatePairsForViewport() and newGame() once DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  updatePairsForViewport();
+  newGame();
+});
+
+// 2) Re-check pair options when screen size changes
+window.addEventListener('resize', updatePairsForViewport);
 </script>
 </body>
 </html>
