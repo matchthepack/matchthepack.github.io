@@ -134,6 +134,32 @@
     .inner{ transition:none }
     #loadingOverlay::after{ animation:none }
   }
+  /* Hide the Stats toggle on desktop; show on mobile */
+.mobile-only { display: none; }
+
+@media (max-width: 640px){
+  .mobile-only { display: inline-flex; align-items:center; }
+
+  /* Collapse the side panel by default on phones */
+  aside.panel { display: none; }
+  /* When toggled, show it */
+  body.show-stats aside.panel { display: block; }
+
+  /* Force exactly 4 columns on mobile */
+  .grid { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* Optional: nicer panel entrance on mobile */
+@media (max-width: 640px){
+  aside.panel {
+    animation: slideDown .18s ease-out both;
+  }
+  @keyframes slideDown {
+    from { opacity:0; transform: translateY(-4px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+}
+
 </style>
 </head>
 <body>
@@ -154,6 +180,7 @@
       </label>
       <button id="newGame" class="primary">New Game</button>
       <button id="showHow" class="ghost" title="How to play">How to Play</button>
+	  <button id="toggleStats" class="ghost mobile-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</button>
     </div>
   </header>
 
@@ -170,7 +197,7 @@
       <div class="tiny">When game is over, hover on desktop to see image description.</div>
     </aside>
 
-    <section class="panel">
+    <section id="statsPanel" class="panel">
       <div id="grid" class="grid" aria-label="Memory game grid"></div>
     </section>
   </main>
@@ -302,6 +329,22 @@
   const pairsSel = $('#pairs'), newBtn = $('#newGame'), restartLink = $('#restartLink');
   const winDlg = $('#win'), howDlg = $('#how'), showHowBtn = $('#showHow'), playAgainBtn = $('#playAgain');
   const useRS = $('#useRS');
+  
+  const toggleStatsBtn = document.getElementById('toggleStats');
+
+if (toggleStatsBtn) {
+  toggleStatsBtn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('show-stats');
+    toggleStatsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+
+    // If opening on mobile, scroll it into view
+    if (on) {
+      const panel = document.getElementById('statsPanel');
+      panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+}
+
 
   function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
   function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
