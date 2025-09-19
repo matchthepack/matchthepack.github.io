@@ -500,7 +500,7 @@ if (toggleStatsBtn) {
   }
 
 function buildShareText({ time, moves, pairs }) {
-  return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! <img src="logo.png" alt="RS Wolves Logo" style="height:1em;vertical-align:middle;">`;
+  return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
 }
   function currentPageLink(){ return location.href.split('#')[0]; }
   async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); alert('Link copied!') } catch{ prompt('Copy this link:', text) } }
