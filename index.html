@@ -3,56 +3,83 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
 <title>Match the Pack — RS Wolves Memory Game</title>
 <style>
   :root{ --bg:#0f172a; --panel:#111827; --card:#1f2937; --ink:#e5e7eb; --muted:#9ca3af; --accent:#3b82f6; --accent-2:#22c55e; --gold:#f59e0b; }
   *{ box-sizing:border-box }
-  body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; background:linear-gradient(120deg,#0b1225,#111827 40%,#0b1225); color:var(--ink); min-height:100vh; display:flex; flex-direction:column }
-  header{ max-width:1100px; width:92vw; margin:18px auto 10px; display:flex; align-items:center; gap:16px; flex-wrap:wrap }
-  .title{ font-size:clamp(22px,3.2vw,30px); font-weight:800; letter-spacing:.4px }
+  body{
+    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    background:linear-gradient(120deg,#0b1225,#111827 40%,#0b1225); color:var(--ink);
+    min-height:100vh; display:flex; flex-direction:column; padding-bottom:env(safe-area-inset-bottom);
+  }
+
+  header{ max-width:1100px; width:92vw; margin:18px auto 10px; display:flex; flex-wrap:wrap; align-items:center; gap:10px }
+  .title{
+    display:flex; align-items:center; gap:6px;
+    font-size:clamp(22px,3.2vw,30px); font-weight:800; letter-spacing:.4px; white-space:nowrap;
+  }
+  .title img{ height:.9em; width:auto; vertical-align:middle; flex-shrink:0 }
+  .slogan{ font-size:14px; font-weight:500; color:var(--muted); margin: -4px 0 0 0; width:100% }
+
   .muted{ color:var(--muted) }
   .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-left:auto }
-  select, button, label{ background:var(--card); color:var(--ink); border:1px solid #2b3443; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600 }
+  select, button, label{
+    background:var(--card); color:var(--ink); border:1px solid #2b3443;
+    padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600; font-size:16px;
+    -webkit-tap-highlight-color:transparent;
+  }
   button.primary{ background:var(--accent); border-color:transparent; color:white }
   button.ghost{ background:transparent }
+
   main{ max-width:1100px; width:92vw; margin:0 auto 30px; display:grid; grid-template-columns: 280px 1fr; gap:18px }
   @media (max-width:900px){ main{ grid-template-columns:1fr } }
-  .panel{ background:linear-gradient(180deg,#0f172a,#0b1225); border:1px solid #22304a; border-radius:16px; padding:14px 14px 16px; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+
+  .panel{ background:linear-gradient(180deg,#0f172a,#0b1225); border:1px solid #22304a; border-radius:16px; padding:14px 14px 16px; box-shadow:0 10px 24px rgba(0,0,0,.22) }
   .stats{ display:grid; grid-template-columns:1fr 1fr; gap:8px }
   .stat{ background:#0d1528; border:1px solid #1b2942; border-radius:12px; padding:10px 12px }
   .stat .label{ font-size:12px; color:var(--muted) }
   .stat .val{ font-size:20px; font-weight:800 }
   .best{ margin-top:10px; font-size:13px; color:var(--gold) }
-  .grid{ display:grid; gap:10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .card{ position:relative; height:0; padding-bottom:100%; perspective:1000px; border-radius:14px; overflow:hidden }
-  .inner{ position:absolute; inset:0; transition:transform .45s ease; transform-style:preserve-3d; border-radius:14px; box-shadow:0 10px 24px rgba(0,0,0,.22), inset 0 0 0 1px #22304a }
+  .tiny{ font-size:12px; color:var(--muted); margin-left:6px }
+
+  /* Responsive grid: auto-fit cards nicely */
+  .grid{
+    display:grid; gap:10px;
+    grid-template-columns: repeat(auto-fit, minmax(min(28vw, 130px), 1fr));
+  }
+
+  .card{
+    position:relative; height:0; padding-bottom:100%; perspective:1000px; border-radius:14px; overflow:hidden;
+    contain:layout paint size; /* perf hint */
+  }
+  .inner{
+    position:absolute; inset:0; transform-style:preserve-3d; border-radius:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,.22), inset 0 0 0 1px #22304a;
+    transition:transform .45s ease; will-change:transform; transform:translateZ(0);
+  }
   .card.matched .inner{ box-shadow:0 0 0 2px var(--accent-2), inset 0 0 0 2px var(--accent-2) }
   .face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--panel) }
   .front{ transform:rotateY(180deg) }
-.back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(120px 120px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
-    radial-gradient(120px 120px at 80% 90%, rgba(34,197,94,.18), transparent 60%),
-    linear-gradient(180deg, #0b1225, #0d1528);
-}
-
-.back .logo {
-  width: 50%;              /* half the card width */
-  max-width: 110px;        /* don’t let it get too big on large grids */
-  height: auto;
-  object-fit: contain;
-  opacity: .95;
-  pointer-events: none;
-  user-select: none;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
-}
-
   .card.flipped .inner{ transform:rotateY(180deg) }
+
+  .back{
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(120px 120px at 20% 10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(120px 120px at 80% 90%, rgba(34,197,94,.18), transparent 60%),
+      linear-gradient(180deg, #0b1225, #0d1528);
+  }
+  .back .logo{
+    width:50%; max-width:110px; height:auto; object-fit:contain; opacity:.95; pointer-events:none; user-select:none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+  }
+
   img{ width:100%; height:100%; object-fit:cover; display:block }
+
   footer{ margin:16px auto 22px; width:92vw; max-width:1100px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap }
+
   dialog{ background:#0b1225; border:1px solid #22304a; color:var(--ink); border-radius:16px; padding:18px 16px; width:min(560px,92vw) }
   dialog::backdrop{ background:rgba(0,0,0,.6) }
   .win-title{ font-size:22px; font-weight:800; margin:0 0 8px }
@@ -60,136 +87,59 @@
   .win-grid .stat{ background:#0d1528 }
   .focusable{ outline:none }
   .focusable:focus-visible{ box-shadow:0 0 0 3px rgba(59,130,246,.8) inset }
-  .tiny{ font-size:12px; color:var(--muted); margin-left:6px }
 
   /* Loading overlay */
   #loadingOverlay{
     position:fixed; inset:0; background:rgba(15,23,42,0.9);
     color:#fff; display:flex; align-items:center; justify-content:center;
-    font-size:24px; font-weight:700; z-index:9999; opacity:0; pointer-events:none;
-    transition:opacity .3s ease;
+    font-size:24px; font-weight:700; z-index:9999; opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  #loadingOverlay::after{
+    content:""; width:28px; height:28px; margin-left:10px; border:3px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%;
+    display:inline-block; animation:spin 1s linear infinite; vertical-align:middle;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+
+  .share-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
+  .btn{ background:var(--card); border:1px solid #2b3443; color:var(--ink); padding:8px 12px; border-radius:10px; font-weight:600; text-decoration:none; cursor:pointer }
+  .btn.ghost{ background:transparent }
+  .btn:disabled{ opacity:.6; cursor:not-allowed }
+
+  /* Mobile tweaks */
+  @media (max-width:900px){
+    header{ gap:10px }
+    .controls{ width:100%; justify-content:space-between }
+  }
+  @media (max-width:640px){
+    .title{ font-size: clamp(18px, 5vw, 24px) }
+    .controls{ gap:8px; flex-wrap:wrap }
+    main{ width:94vw; gap:12px }
+    .panel{ padding:12px }
+    .stats{ grid-template-columns:1fr 1fr }
+    .grid{ gap:8px }
+    footer{ font-size:13px }
+    dialog{ width:min(92vw,520px); padding:14px }
+    .win-grid{ grid-template-columns:1fr }
+  }
+  @media (max-width:400px){
+    .grid{ grid-template-columns: repeat(auto-fit, minmax(min(30vw, 110px), 1fr)); gap:6px }
+    .title{ font-size: clamp(16px, 6vw, 20px) }
+  }
+  @media (max-width:480px){
+    #loadingOverlay{ font-size:18px }
   }
 
-.title img {
-  height: 0.9em;            /* a bit smaller than text */
-  vertical-align: middle;
-  margin-right: 6px;
-  width: auto;
-}
-
-#loadingOverlay::after {
-  content: "";
-  width: 28px;
-  height: 28px;
-  margin-left: 10px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  display: inline-block;
-  animation: spin 1s linear infinite;
-  vertical-align: middle;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-
-.share-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-.btn {
-  background: var(--card);
-  border: 1px solid #2b3443;
-  color: var(--ink);
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
-.btn.ghost { background: transparent }
-.btn:disabled { opacity: .6; cursor: not-allowed }
-
-/* Make grid auto-fit nicely on small screens */
-.grid{
-  /* let CSS auto-choose columns by available space */
-  grid-template-columns: repeat(auto-fit, minmax(min(28vw, 130px), 1fr));
-  gap: 10px;
-}
-
-/* Tweak general spacing on small screens */
-@media (max-width: 900px){
-  header { gap: 10px }
-  .controls { width: 100%; justify-content: space-between }
-}
-
-@media (max-width: 640px){
-  .title { font-size: clamp(18px, 5vw, 24px) }
-  .controls { gap: 8px; flex-wrap: wrap }
-  .controls select, .controls button, .controls label{
-    padding: 10px 12px; border-radius: 12px; font-weight: 600;
+  /* Motion reduction */
+  @media (prefers-reduced-motion: reduce){
+    .inner{ transition:none }
+    #loadingOverlay::after{ animation:none }
   }
-  main { width: 94vw; gap: 12px }
-  .panel { padding: 12px }
-  .stats { grid-template-columns: 1fr 1fr }
-  .grid { gap: 8px }
-  footer { font-size: 13px }
-  dialog { width: min(92vw, 520px); padding: 14px }
-  .win-grid { grid-template-columns: 1fr; } /* stack stats in win dialog */
-}
-
-/* Very narrow phones */
-@media (max-width: 400px){
-  .grid{
-    /* slightly smaller minimum so 3 columns always fit */
-    grid-template-columns: repeat(auto-fit, minmax(min(30vw, 110px), 1fr));
-    gap: 6px;
-  }
-  .title { font-size: clamp(16px, 6vw, 20px) }
-}
-
-/* Title logo stays tidy on mobile */
-.title img {
-  height: 0.9em;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-
-/* Loading overlay text scales down a bit on phones */
-@media (max-width: 480px){
-  #loadingOverlay { font-size: 18px }
-}
-
-/* Make buttons feel tappable */
-button, select, label {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Avoid scroll bounce pulling cards out of view on iOS notch devices */
-body { padding-bottom: env(safe-area-inset-bottom); }
-
-/* Title logo stays tidy on mobile */
-.title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: clamp(22px, 3.2vw, 30px);
-  font-weight: 800;
-  letter-spacing: .4px;
-  white-space: nowrap;   /* keep on one line */
-}
-.title img { height: 0.9em; flex-shrink: 0; }
-.slogan { font-size: 14px; font-weight: 500; color: var(--muted); margin: -6px 0 0 0; }
-  
 </style>
 </head>
 <body>
   <header>
-   <div class="title"> <img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
-    <p class="slogan">Match the Pack: Play together, win together!</p>
+    <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
+    <p class="slogan">Sharpen your mind, run with the wolves!</p>
     <div class="controls">
       <label>Pairs:
         <select id="pairs">
@@ -199,9 +149,8 @@ body { padding-bottom: env(safe-area-inset-bottom); }
           <option value="12">24 cards</option>
         </select>
       </label>
-      <label class="muted" title="If off, placeholders are used" style="display: none;">
-        <input id="useRS" type="checkbox" checked="">
-        Use rs-wolves.com photos
+      <label class="muted" title="If off, placeholders are used" style="display:none">
+        <input id="useRS" type="checkbox" checked> Use rs-wolves.com photos
       </label>
       <button id="newGame" class="primary">New Game</button>
       <button id="showHow" class="ghost" title="How to play">How to Play</button>
@@ -218,7 +167,7 @@ body { padding-bottom: env(safe-area-inset-bottom); }
         <div class="stat"><div class="label">Streak</div><div id="streak" class="val">0</div></div>
       </div>
       <div id="best" class="best"></div>
-      <div class="tiny">When game is over, hover mouse over image for description of photo!</div>
+      <div class="tiny">When game is over, hover on desktop to see image description.</div>
     </aside>
 
     <section class="panel">
@@ -231,360 +180,280 @@ body { padding-bottom: env(safe-area-inset-bottom); }
     <div><a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none">↻ Restart</a></div>
   </footer>
 
-<dialog id="win">
-  <p class="win-title">🏆 You ran with the pack!</p>
-  <div class="win-grid">
-    <div class="stat"><div class="label">Time</div><div id="winTime" class="val">—</div></div>
-    <div class="stat"><div class="label">Moves</div><div id="winMoves" class="val">—</div></div>
-    <div class="stat"><div class="label">Best</div><div id="winBest" class="val">—</div></div>
-  </div>
-
-  <!-- Share row -->
-  <div class="share-row">
-    <button id="shareNative" class="share btn">🔗 Share</button>
-    <button id="shareCopy" class="share btn ghost">📋 Copy link</button>
-    <a id="shareX" class="share btn ghost" target="_blank" rel="noopener">𝕏 Post</a>
-    <a id="shareFB" class="share btn ghost" target="_blank" rel="noopener">Facebook</a>
-    <a id="shareEmail" class="share btn ghost">Email</a>
-  </div>
-
-  <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px">
-    <form method="dialog"><button class="ghost">Close</button></form>
-    <button id="playAgain" class="primary">Play Again</button>
-  </div>
-</dialog>
-
+  <dialog id="win">
+    <p class="win-title">🏆 You ran with the pack!</p>
+    <div class="win-grid">
+      <div class="stat"><div class="label">Time</div><div id="winTime" class="val">—</div></div>
+      <div class="stat"><div class="label">Moves</div><div id="winMoves" class="val">—</div></div>
+      <div class="stat"><div class="label">Best</div><div id="winBest" class="val">—</div></div>
+    </div>
+    <div class="share-row">
+      <button id="shareNative" class="share btn">🔗 Share</button>
+      <button id="shareCopy" class="share btn ghost">📋 Copy link</button>
+      <a id="shareX" class="share btn ghost" target="_blank" rel="noopener">𝕏 Post</a>
+      <a id="shareFB" class="share btn ghost" target="_blank" rel="noopener">Facebook</a>
+      <a id="shareEmail" class="share btn ghost">Email</a>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px">
+      <form method="dialog"><button class="ghost">Close</button></form>
+      <button id="playAgain" class="primary">Play Again</button>
+    </div>
+  </dialog>
 
   <dialog id="how">
     <p class="win-title">How to Play</p>
     <div class="muted" style="line-height:1.6">
       Flip two cards. If the photos match, they stay face-up. If not, they flip back.
-      Clear the board with the fewest moves in the fastest time! <br>
-      When game is over, hover mouse over image for description of photo!
+      Clear the board with the fewest moves in the fastest time!
     </div>
     <form method="dialog" style="margin-top:12px"><button class="primary">Got it</button></form>
   </dialog>
 
-  <!-- ✅ Move overlay ABOVE the script so it exists before newGame() runs -->
   <div id="loadingOverlay">🔄 Loading new game...</div>
 
 <script>
-  const LOGO_URL = 'logo.png'; // or a full URL if hosted elsewhere
+  const LOGO_URL = 'logo.png'; // or absolute URL
 
-/* ===============================
-   YOUR APPTEGY FETCHER (includes Cloudflare Worker proxy)
-   =============================== */
-async function fetchApptegyImages({
-  roots = ["/live-feed"],
-  pages = 2,
-  limit = 50
-} = {}) {
-  const ORIGIN = "https://www.rs-wolves.com";
-  const IMG_CDNS = ["core-docs.s3.amazonaws.com", "cmsv2-assets.apptegy.net"];
-  const isCdnImg = src => IMG_CDNS.some(host => src.includes(host));
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-  const PROXY = "https://rswolves-proxy.ckonkol.workers.dev/?url="; // your Worker
+  /* ===============================
+     RS Wolves fetcher (via Cloudflare Worker proxy)
+     =============================== */
+  async function fetchApptegyImages({ roots=["/live-feed"], pages=2, limit=50 } = {}){
+    const ORIGIN = "https://www.rs-wolves.com";
+    const IMG_CDNS = ["core-docs.s3.amazonaws.com","cmsv2-assets.apptegy.net"];
+    const isCdn = src => IMG_CDNS.some(h => src.includes(h));
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const PROXY = "https://rswolves-proxy.ckonkol.workers.dev/?url=";
 
-  async function getDOM(url) {
-    const res = await fetch(PROXY + encodeURIComponent(url), { mode: "cors" });
-    if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
-    const html = await res.text();
-    return new DOMParser().parseFromString(html, "text/html");
-  }
-  function textTrim(s){ return (s||"").replace(/\s+/g," ").trim(); }
-
-  function extractContext(imgEl){
-    let node = imgEl;
-    for (let i=0;i<8 && node && node!==document;i++){
-      if (node.matches?.("article, .post, .feed-item, .live-feed-item, li, section")) break;
-      node = node.parentElement;
+    async function getDOM(url){
+      const res = await fetch(PROXY + encodeURIComponent(url), { mode:"cors" });
+      if(!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
+      const html = await res.text();
+      return new DOMParser().parseFromString(html, "text/html");
     }
-    const container = node || imgEl.closest("figure") || imgEl.parentElement;
-    const caption = container?.querySelector?.("figcaption")?.textContent || "";
-    const timeEl = container?.querySelector?.("time[datetime]") || container?.querySelector?.("time");
-    const dateISO = timeEl?.getAttribute?.("datetime") || "";
-    const dateText = timeEl?.textContent || "";
-    const ageEl = container?.querySelector?.('*:is(.age, .meta, .byline, .date)') || null;
+    const textTrim = s => (s||"").replace(/\s+/g," ").trim();
 
-    let postText = "";
-    if (container){
-      const clone = container.cloneNode(true);
-      clone.querySelectorAll("figcaption, nav, button, a[aria-label='Read more']").forEach(n=>n.remove());
-      clone.querySelectorAll("img").forEach(n=>n.remove());
-      postText = textTrim(clone.textContent || "");
-    }
-    return { caption:textTrim(caption), description:postText, date: dateISO || textTrim(dateText) || textTrim(ageEl?.textContent || "") };
-  }
-
-  function guessMime(u=""){ const m=u.toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(?:\?|#|$)/); if(!m) return "image/*"; const ext=m[1]==="jpg"?"jpeg":m[1]; return `image/${ext}`; }
-
-  function toWpLike(imgEl, pageUrl){
-    const url = imgEl.currentSrc || imgEl.src || "";
-    const alt = imgEl.getAttribute("alt") || "";
-    const title = imgEl.getAttribute("title") || alt || "";
-    const { caption, description, date } = extractContext(imgEl);
-    return { url, title, alt, caption, description, mime: guessMime(url), date, width:null, height:null, page_url: pageUrl };
-  }
-
-  const results=[]; const seen=new Set();
-  for (const root of roots){
-    for (let p=1; p<=pages; p++){
-      const url = `${ORIGIN}${root}${p>1?`?page=${p}`:""}`;
-      try{
-        const dom = await getDOM(url);
-        const imgs = [...dom.querySelectorAll('img[src], source[srcset] ~ img, picture img')];
-        for (const img of imgs){
-          const src = img.currentSrc || img.src || "";
-          if (!src) continue;
-          if (!isCdnImg(src)) continue;
-          if (/\.(svg|mp4|webm|pdf)(?:\?|#|$)/i.test(src)) continue;
-          const media = toWpLike(img, url);
-          if (!seen.has(media.url)){ seen.add(media.url); results.push(media); if (results.length>=limit) return results; }
-        }
-        await sleep(250);
-      } catch(e){ console.warn("Page fetch error:", e); }
-    }
-  }
-  return results;
-}
-
-/* ===============================
-   Placeholders
-   =============================== */
-function getPlaceholderImages(n){
-  const seed = Date.now().toString(36);
-  return Array.from({length:n}, (_,i)=> ({
-    url: `https://picsum.photos/seed/${seed}-${i}/400/400`,
-    alt: `Placeholder #${i+1}`,
-    title: `Photo ${i+1}`,
-    caption: '', description: '', mime: 'image/jpeg', date: ''
-  }));
-}
-
-/* ===============================
-   Game Logic
-   =============================== */
-const $ = s => document.querySelector(s);
-const grid = $('#grid');
-const timeEl = $('#time'), movesEl = $('#moves'), matchesEl = $('#matches'), streakEl = $('#streak'), bestEl = $('#best');
-const pairsSel = $('#pairs'), newBtn = $('#newGame'), restartLink = $('#restartLink');
-const winDlg = $('#win'), howDlg = $('#how'), showHowBtn = $('#showHow'), playAgainBtn = $('#playAgain');
-const useRS = $('#useRS');
-
-/* Loading overlay helpers */
-function showLoading(){
-  const o = document.getElementById('loadingOverlay');
-  if(!o) return;
-  newBtn.disabled = true;
-  o.style.opacity = 1; o.style.pointerEvents = "auto";
-}
-function hideLoading(){
-  const o = document.getElementById('loadingOverlay');
-  if(!o) return;
-  o.style.opacity = 0; o.style.pointerEvents = "none";
-  newBtn.disabled = false;
-}
-
-let timer=null, seconds=0, moves=0, matches=0, streak=0;
-let lock=false, first=null, second=null, deck=[];
-let totalPairs = parseInt(pairsSel.value,10);
-
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
-function fmtTime(s){ const m=Math.floor(s/60).toString().padStart(2,'0'); const sec=(s%60).toString().padStart(2,'0'); return `${m}:${sec}` }
-function startTimer(){ stopTimer(); timer=setInterval(()=>{ seconds++; timeEl.textContent=fmtTime(seconds) },1000) }
-function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
-function resetStats(){ seconds=0;moves=0;matches=0;streak=0; timeEl.textContent='00:00'; movesEl.textContent='0'; matchesEl.textContent='0'; streakEl.textContent='0' }
-function setGridColumns(pairCount){
-  // On small screens, let CSS handle it responsively
-  if (window.innerWidth <= 640) return;
-
-  const map = {
-    6:  'repeat(4, 1fr)',
-    8:  'repeat(4, 1fr)',
-    10: 'repeat(5, 1fr)',
-    12: 'repeat(6, 1fr)'
-  };
-  grid.style.gridTemplateColumns = map[pairCount] || 'repeat(4, 1fr)';
-}
-// Re-evaluate grid columns if device rotates or viewport changes
-window.addEventListener('resize', () =>
-  setGridColumns(parseInt(pairsSel.value, 10))
-);
-
-function bestKey(){ return `best_${totalPairs}` } function getBest(){ return JSON.parse(localStorage.getItem(bestKey())||'null') } function setBest(o){ localStorage.setItem(bestKey(), JSON.stringify(o)) }
-function showBest(){ const b=getBest(); bestEl.textContent = b ? `Best ${totalPairs} pairs → ${fmtTime(b.time)} • ${b.moves} moves` : '' }
-function announceWin(){
-  const b=getBest();
-  const cur={time:seconds,moves};
-  let bestText='—';
-  if(!b || cur.time<b.time || (cur.time===b.time && cur.moves<b.moves)){
-    setBest(cur);
-    bestText=`New Best! ${fmtTime(cur.time)} • ${cur.moves} moves`;
-  } else {
-    bestText=`Best: ${fmtTime(b.time)} • ${b.moves} moves`;
-  }
-  $('#winTime').textContent = fmtTime(seconds);
-  $('#winMoves').textContent = moves;
-  $('#winBest').textContent = bestText;
-
-  // 🔗 Prepare share payload
-  const pairs = totalPairs;
-  const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
-  const url  = currentPageLink();
-  const shareData = { title: 'Match the Pack', text, url };
-
-  // Wire up buttons each time dialog opens
-  const btnNative = document.getElementById('shareNative');
-  const btnCopy   = document.getElementById('shareCopy');
-  const aX        = document.getElementById('shareX');
-  const aFB       = document.getElementById('shareFB');
-  const aEmail    = document.getElementById('shareEmail');
-
-  // Native Web Share (if available)
-  if (navigator.share) {
-    btnNative.disabled = false;
-    btnNative.onclick = () => navigator.share(shareData).catch(()=>{});
-  } else {
-    btnNative.disabled = true;
-  }
-
-  // Copy link
-  btnCopy.onclick = () => copyToClipboard(url);
-
-  // X / Twitter
-  const xUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
-  aX.href = xUrl;
-
-  // Facebook
-  const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-  aFB.href = fbUrl;
-
-  // Email
-  const mailto = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') +
-                 '&body=' + encodeURIComponent(text + '\n\n' + url);
-  aEmail.href = mailto;
-
-  stopTimer();
-  winDlg.showModal();
-}
-
-function wait(ms){ return new Promise(r=>setTimeout(r,ms)) }
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
-
-function buildDeck(images, pairCount){
-  const uniq = images.slice(0, pairCount);
-  const doubled = uniq.flatMap((img,idx)=>[
-    { id:`${idx}-A`, pair:idx, img },
-    { id:`${idx}-B`, pair:idx, img }
-  ]);
-  return shuffle(doubled);
-}
-
-function renderDeck(){
-  grid.innerHTML='';
-  for(const card of deck){
-    const el=document.createElement('button');
-    el.className='card focusable';
-    el.type='button';
-    el.setAttribute('data-id',card.id);
-    el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
-
-    const alt = escapeHtml(card.img.alt || '');
-    const titleAttr = alt ? `title="${alt}"` : '';
-
-    el.innerHTML=`
-      <div class="inner">
-        <div class="face back"><img class="logo" src="${LOGO_URL}" alt="School logo"></div>
-        <div class="face front">
-          <img alt="${alt}" ${titleAttr} src="${card.img.url}">
-        </div>
-      </div>`;
-    el.addEventListener('click',()=>flipCard(el,card));
-    el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
-    grid.appendChild(el);
-  }
-}
-
-async function flipCard(el, card){
-  if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
-  if(moves===0 && seconds===0 && !timer) startTimer();
-  el.classList.add('flipped');
-  if(!first){ first={el,card}; return }
-  second={el,card}; lock=true; moves++; movesEl.textContent=moves;
-
-  if(first.card.pair===second.card.pair){
-    matches++; matchesEl.textContent=matches; streak++; streakEl.textContent=streak;
-    first.el.classList.add('matched'); second.el.classList.add('matched');
-    first=second=null; lock=false; if(matches===totalPairs) setTimeout(announceWin,400);
-  } else {
-    streak=0; streakEl.textContent='0'; await wait(600);
-    first.el.classList.remove('flipped'); second.el.classList.remove('flipped');
-    first=second=null; lock=false;
-  }
-}
-
-function buildShareText({ time, moves, pairs }) {
-  return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs*2}-card board! 🐺`;
-}
-function currentPageLink() {
-  // Keep it simple: share the page URL without hash
-  return location.href.split('#')[0];
-}
-async function copyToClipboard(text) {
-  try { await navigator.clipboard.writeText(text); alert('Link copied!'); }
-  catch { prompt('Copy this link:', text); }
-}
-
-
-/* RS Wolves feeds */
-const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
-
-async function newGame() {
-  showLoading();  // show overlay immediately
-  const minLoad = new Promise(r => setTimeout(r, 3000)); // ⏱ force 3s display
-
-  stopTimer();
-  resetStats();
-  winDlg.close();
-  totalPairs = parseInt(pairsSel.value, 10);
-  setGridColumns(totalPairs);
-  showBest();
-
-  let images = [];
-  if (useRS.checked) {
-    try {
-      const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
-      images = rsImgs.filter(x => x && x.url);
-      if (images.length < totalPairs) {
-        const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
-        images = images.concat(more);
+    function extractContext(imgEl){
+      let node = imgEl;
+      for(let i=0;i<8 && node && node!==document;i++){
+        if(node.matches?.("article, .post, .feed-item, .live-feed-item, li, section")) break;
+        node = node.parentElement;
       }
-      images = shuffle(images).slice(0, totalPairs);
-    } catch (err) {
-      console.warn('Apptegy fetch failed; using placeholders:', err);
-      images = getPlaceholderImages(totalPairs);
+      const c = node || imgEl.closest("figure") || imgEl.parentElement;
+      const caption = c?.querySelector?.("figcaption")?.textContent || "";
+      const timeEl = c?.querySelector?.("time[datetime]") || c?.querySelector?.("time");
+      const dateISO = timeEl?.getAttribute?.("datetime") || "";
+      const dateText = timeEl?.textContent || "";
+      let postText="";
+      if(c){
+        const clone=c.cloneNode(true);
+        clone.querySelectorAll("figcaption, nav, button, a[aria-label='Read more'], img").forEach(n=>n.remove());
+        postText = textTrim(clone.textContent||"");
+      }
+      return { caption:textTrim(caption), description:postText, date: dateISO || textTrim(dateText) };
     }
-  } else {
-    images = getPlaceholderImages(totalPairs);
+    const guessMime = u => {
+      const m = (u||"").toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(?:\?|#|$)/);
+      if(!m) return "image/*";
+      return `image/${m[1]==="jpg"?"jpeg":m[1]}`;
+    };
+
+    const results=[]; const seen=new Set();
+    for(const root of roots){
+      for(let p=1;p<=pages;p++){
+        const url = `${ORIGIN}${root}${p>1?`?page=${p}`:""}`;
+        try{
+          const dom = await getDOM(url);
+          const imgs = [...dom.querySelectorAll('img[src], source[srcset] ~ img, picture img')];
+          for(const img of imgs){
+            const src = img.currentSrc || img.src || "";
+            if(!src || !isCdn(src) || /\.(svg|mp4|webm|pdf)(?:\?|#|$)/i.test(src)) continue;
+            const { caption, description, date } = extractContext(img);
+            const alt = img.getAttribute("alt") || "";
+            const title = img.getAttribute("title") || alt || "";
+            const media = { url:src, title, alt, caption, description, mime:guessMime(src), date, width:null, height:null, page_url:url };
+            if(!seen.has(media.url)){ seen.add(media.url); results.push(media); if(results.length>=limit) return results; }
+          }
+          await sleep(200);
+        }catch(e){ console.warn("Page fetch error:", e); }
+      }
+    }
+    return results;
   }
 
-  deck = buildDeck(images, totalPairs);
-  renderDeck();
+  /* ===============================
+     Placeholders
+     =============================== */
+  function getPlaceholderImages(n){
+    const seed = Date.now().toString(36);
+    return Array.from({length:n}, (_,i)=> ({
+      url: `https://picsum.photos/seed/${seed}-${i}/400/400`,
+      alt: `Placeholder #${i+1}`,
+      title: `Photo ${i+1}`,
+      caption: '', description: '', mime: 'image/jpeg', date: ''
+    }));
+  }
 
-  await minLoad; // ✅ ensures at least 3 seconds pass
-  hideLoading(); // hide overlay AFTER minimum time
-}
+  /* ===============================
+     Game Logic
+     =============================== */
+  const $ = s => document.querySelector(s);
+  const grid = $('#grid');
+  const timeEl = $('#time'), movesEl = $('#moves'), matchesEl = $('#matches'), streakEl = $('#streak'), bestEl = $('#best');
+  const pairsSel = $('#pairs'), newBtn = $('#newGame'), restartLink = $('#restartLink');
+  const winDlg = $('#win'), howDlg = $('#how'), showHowBtn = $('#showHow'), playAgainBtn = $('#playAgain');
+  const useRS = $('#useRS');
 
+  function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
+  function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
 
-/* Events */
-newBtn.addEventListener('click', newGame);
-restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
-pairsSel.addEventListener('change', newGame);
-showHowBtn.addEventListener('click', ()=> howDlg.showModal());
-playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
+  let timer=null, seconds=0, moves=0, matches=0, streak=0;
+  let lock=false, first=null, second=null, deck=[];
+  let totalPairs = parseInt(pairsSel.value,10);
 
-/* ✅ Ensure DOM is ready before first run (overlay exists) */
-window.addEventListener('DOMContentLoaded', newGame);
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+  function fmtTime(s){ const m=String(Math.floor(s/60)).padStart(2,'0'); const sec=String(s%60).padStart(2,'0'); return `${m}:${sec}` }
+  function startTimer(){ stopTimer(); timer=setInterval(()=>{ seconds++; timeEl.textContent=fmtTime(seconds) },1000) }
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
+  function resetStats(){ seconds=0;moves=0;matches=0;streak=0; timeEl.textContent='00:00'; movesEl.textContent='0'; matchesEl.textContent='0'; streakEl.textContent='0' }
+
+  function setGridColumns(pairCount){
+    // On small screens, let CSS auto-fit handle it responsively
+    if (window.innerWidth <= 640) return;
+    const map={6:'repeat(4,1fr)',8:'repeat(4,1fr)',10:'repeat(5,1fr)',12:'repeat(6,1fr)'};
+    grid.style.gridTemplateColumns = map[pairCount] || 'repeat(4,1fr)';
+  }
+  window.addEventListener('resize', ()=> setGridColumns(parseInt(pairsSel.value,10)));
+
+  function bestKey(){ return `best_${totalPairs}` } function getBest(){ return JSON.parse(localStorage.getItem(bestKey())||'null') } function setBest(o){ localStorage.setItem(bestKey(), JSON.stringify(o)) }
+  function showBest(){ const b=getBest(); bestEl.textContent = b ? `Best ${totalPairs} pairs → ${fmtTime(b.time)} • ${b.moves} moves` : '' }
+
+  function buildDeck(images, pairCount){
+    const uniq = images.slice(0, pairCount);
+    const doubled = uniq.flatMap((img,idx)=>[
+      { id:`${idx}-A`, pair:idx, img },
+      { id:`${idx}-B`, pair:idx, img }
+    ]);
+    return shuffle(doubled);
+  }
+
+  function renderDeck(){
+    grid.innerHTML='';
+    for(const card of deck){
+      const el=document.createElement('button');
+      el.className='card focusable'; el.type='button';
+      el.setAttribute('data-id',card.id);
+      el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
+
+      const alt = (card.img.alt || '').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const titleAttr = alt ? `title="${alt}"` : '';
+
+      el.innerHTML=`
+        <div class="inner">
+          <div class="face back"><img class="logo" src="${LOGO_URL}" alt="School logo" loading="lazy" decoding="async"></div>
+          <div class="face front">
+            <img ${titleAttr} alt="${alt}" src="${card.img.url}" loading="lazy" decoding="async" fetchpriority="low">
+          </div>
+        </div>`;
+      el.addEventListener('click',()=>flipCard(el,card), { passive:true });
+      el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
+      grid.appendChild(el);
+    }
+  }
+
+  async function flipCard(el, card){
+    if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+    if(moves===0 && seconds===0 && !timer) startTimer();
+    el.classList.add('flipped');
+    if(!first){ first={el,card}; return }
+    second={el,card}; lock=true; moves++; movesEl.textContent=moves;
+
+    if(first.card.pair===second.card.pair){
+      matches++; matchesEl.textContent=matches; streak++; streakEl.textContent=streak;
+      first.el.classList.add('matched'); second.el.classList.add('matched');
+      first=second=null; lock=false; if(matches===totalPairs) setTimeout(announceWin,350);
+    } else {
+      streak=0; streakEl.textContent='0'; await new Promise(r=>setTimeout(r,500));
+      first.el.classList.remove('flipped'); second.el.classList.remove('flipped');
+      first=second=null; lock=false;
+    }
+  }
+
+  function buildShareText({ time, moves, pairs }) {
+    return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs*2}-card board! 🐺`;
+  }
+  function currentPageLink(){ return location.href.split('#')[0]; }
+  async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); alert('Link copied!') } catch{ prompt('Copy this link:', text) } }
+
+  function announceWin(){
+    const b=getBest(); const cur={time:seconds,moves};
+    let bestText='—';
+    if(!b || cur.time<b.time || (cur.time===b.time && cur.moves<b.moves)){ setBest(cur); bestText=`New Best! ${fmtTime(cur.time)} • ${cur.moves} moves`; }
+    else { bestText=`Best: ${fmtTime(b.time)} • ${b.moves} moves`; }
+    $('#winTime').textContent = fmtTime(seconds);
+    $('#winMoves').textContent = moves;
+    $('#winBest').textContent = bestText;
+
+    const pairs = totalPairs;
+    const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
+    const url  = currentPageLink();
+    const shareData = { title: 'Match the Pack', text, url };
+
+    const btnNative = document.getElementById('shareNative');
+    const btnCopy   = document.getElementById('shareCopy');
+    const aX        = document.getElementById('shareX');
+    const aFB       = document.getElementById('shareFB');
+    const aEmail    = document.getElementById('shareEmail');
+
+    if (navigator.share) { btnNative.disabled=false; btnNative.onclick=()=>navigator.share(shareData).catch(()=>{}); }
+    else { btnNative.disabled=true; }
+    btnCopy.onclick = () => copyToClipboard(url);
+    aX.href  = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
+    aFB.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    aEmail.href = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') + '&body=' + encodeURIComponent(text + '\n\n' + url);
+
+    stopTimer();
+    winDlg.showModal();
+  }
+
+  const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
+
+  async function newGame(){
+    showLoading();
+    const minLoad = new Promise(r => setTimeout(r, 3000)); // keep overlay visible ≥3s
+    stopTimer(); resetStats(); winDlg.close();
+    totalPairs = parseInt(pairsSel.value,10);
+    setGridColumns(totalPairs); showBest();
+
+    let images=[];
+    if(useRS.checked){
+      try{
+        const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
+        images = rsImgs.filter(x=>x && x.url);
+        if(images.length < totalPairs){
+          const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
+          images = images.concat(more);
+        }
+        images = shuffle(images).slice(0, totalPairs);
+      }catch(err){
+        console.warn('Apptegy fetch failed; using placeholders:', err);
+        images = getPlaceholderImages(totalPairs);
+      }
+    } else { images = getPlaceholderImages(totalPairs); }
+
+    deck = buildDeck(images, totalPairs);
+    renderDeck();
+
+    await minLoad;
+    hideLoading();
+  }
+
+  newBtn.addEventListener('click', newGame, { passive:true });
+  restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
+  pairsSel.addEventListener('change', newGame);
+  showHowBtn.addEventListener('click', ()=> howDlg.showModal());
+  playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
+
+  window.addEventListener('DOMContentLoaded', newGame);
 </script>
 </body>
 </html>
