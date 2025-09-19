@@ -105,54 +105,44 @@
   .btn.ghost{ background:transparent }
   .btn:disabled{ opacity:.6; cursor:not-allowed }
 
-  /* Mobile tweaks */
-  @media (max-width:900px){
-    header{ gap:10px }
-    .controls{ width:100%; justify-content:space-between }
-  }
-  @media (max-width: 640px){
-  /* Force exactly 3 columns on mobile */
-  .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+ /* Mobile tweaks */
+@media (max-width: 900px){
+  header { gap: 10px }
+  .controls { width: 100%; justify-content: space-between }
 }
 
-  @media (max-width:400px){
-    .grid{ grid-template-columns: repeat(auto-fit, minmax(min(30vw, 110px), 1fr)); gap:6px }
-    .title{ font-size: clamp(16px, 6vw, 20px) }
-  }
-  @media (max-width:480px){
-    #loadingOverlay{ font-size:18px }
-  }
-
-  /* Motion reduction */
-  @media (prefers-reduced-motion: reduce){
-    .inner{ transition:none }
-    #loadingOverlay::after{ animation:none }
-  }
-  /* Hide the Stats toggle on desktop; show on mobile */
-.mobile-only { display: none; }
-
+/* === SINGLE mobile block (≤640px) === */
 @media (max-width: 640px){
-  .mobile-only { display: inline-flex; align-items:center; }
+  /* Show Stats toggle on mobile */
+  .mobile-only { display: inline-flex; align-items: center; }
 
   /* Collapse the side panel by default on phones */
   aside.panel { display: none; }
-  /* When toggled, show it */
   body.show-stats aside.panel { display: block; }
 
-  /* Force exactly 4 columns on mobile */
-  .grid { grid-template-columns: repeat(4, 1fr) !important; }
+  /* ✅ Force exactly 3 columns on mobile */
+  .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+
+  .title { font-size: clamp(18px, 5vw, 24px) }
+
+  /* Nice panel entrance */
+  aside.panel { animation: slideDown .18s ease-out both; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 }
 
-/* Optional: nicer panel entrance on mobile */
-@media (max-width: 640px){
-  aside.panel {
-    animation: slideDown .18s ease-out both;
-  }
-  @keyframes slideDown {
-    from { opacity:0; transform: translateY(-4px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
+/* Very narrow phones (optional fine-tune) */
+@media (max-width: 400px){
+  .title { font-size: clamp(16px, 6vw, 20px) }
 }
+
+/* Loading overlay text scales down a bit on phones */
+@media (max-width: 480px){
+  #loadingOverlay { font-size: 18px }
+}
+
 
 </style>
 </head>
