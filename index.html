@@ -303,8 +303,6 @@ header{
   /* Title size on phones */
   .title{ font-size: clamp(18px, 5vw, 24px) }
 }
-</style>
-	<style>
 /* --- FINAL OVERRIDES --- */
 @media (max-width: 640px){
   /* Force exactly 3 columns + comfy gap */
@@ -385,6 +383,67 @@ header{
     transition: none;
     opacity: 1;            /* always visible to avoid motion */
     transform: none;
+  }
+}
+/* === FINAL FIXES (paste at end) === */
+
+/* Let the FRONT face stretch so the figure can fill the card */
+.face.front { 
+  display: block !important;    /* overrides .face { display:flex } */
+}
+
+/* Figure + image fill the entire card area */
+.card-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+}
+.card-figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;             /* ✅ image covers the whole card */
+  display: block;
+}
+
+/* Caption styling + reveal animation */
+.card-figure figcaption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 4px 6px;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(2px);
+  border-top: 1px solid rgba(255,255,255,0.2);
+
+  /* start hidden for flip reveal */
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .25s ease, transform .25s ease;
+  will-change: opacity, transform;
+}
+
+/* Show caption when the card is front-facing or matched */
+.card.flipped .card-figure figcaption,
+.card.matched .card-figure figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+.card.flipped .card-figure figcaption { transition-delay: .08s; }
+
+/* Reduced motion: keep caption visible, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .card-figure figcaption {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
