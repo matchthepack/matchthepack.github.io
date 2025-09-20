@@ -704,7 +704,7 @@ async function refreshLeaderboard(pairs) {
     pairsEl.textContent = `(${pairs*2} cards)`;
 
     const q = query(
-      collection(db, "mtpack_scores"),
+      collection(db, "scores"),
       where("pairs", "==", pairs),
       orderBy("timeSec", "asc"),
       orderBy("moves", "asc"),
@@ -717,7 +717,7 @@ async function refreshLeaderboard(pairs) {
     snap.forEach(doc => {
       const d = doc.data();
       const timeText = (window.fmtTime ? window.fmtTime(d.timeSec) : d.timeSec + 's');
-      rows.push(`<li>${rank++}. ${timeText} — ${d.moves} moves</li>`);
+      rows.push(`<li>${d.username}, ${timeText} — ${d.moves} moves</li>`);
     });
 
     listEl.innerHTML = rows.length ? rows.join("") : `<li>No scores yet — be first!</li>`;
