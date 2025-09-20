@@ -741,5 +741,19 @@ async function refreshLeaderboard(pairs) {
 window.saveScoreToFirebase = saveScoreToFirebase;
 window.refreshLeaderboard  = refreshLeaderboard;
 </script>
+  <script>
+// === OPTIONAL: Lock viewport more strictly ===
+// Put this right before </body>
+
+document.addEventListener('touchstart', e => {
+  // Block pinch zoom
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('wheel', e => {
+  // Block ctrl+wheel zoom (desktop/Android zoom)
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+</script>
 </body>
 </html>
