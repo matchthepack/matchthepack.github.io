@@ -328,16 +328,19 @@ header{
 }
 .card-figure {
   position: relative;
-  display: block;
   width: 100%;
   height: 100%;
+  display: block;
+  overflow: hidden;
 }
 
 .card-figure img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover;   /* ✅ keeps full coverage */
+  display: block;
 }
 
 .card-figure figcaption {
@@ -348,7 +351,7 @@ header{
   padding: 4px 6px;
   font-size: 0.8em;
   font-weight: 600;
-  background: rgba(0,0,0,0.65);  /* dark semi-transparent background */
+  background: rgba(0,0,0,0.65);
   color: #fff;
   text-align: center;
   line-height: 1.2;
