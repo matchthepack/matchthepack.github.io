@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a" />
 <title>Match the Pack — RS Wolves!</title>
 <style>
@@ -227,6 +227,17 @@
 }
 .card.flipped .card-figure figcaption,
 .card.matched .card-figure figcaption{ opacity:1; transform:translateY(0) }
+html, body {
+  -webkit-text-size-adjust: 100%;  /* iOS: don’t auto-resize text (which looks like zoom) */
+  text-size-adjust: 100%;
+  touch-action: manipulation;       /* Chrome/Android: disables double-tap-to-zoom */
+}
+
+/* Ensure all focusable controls are 16px+ so iOS won’t zoom on focus */
+input, select, textarea, button, label {
+  font-size: 16px !important;
+  -webkit-tap-highlight-color: transparent;
+}
 
 </style>
 </head>
