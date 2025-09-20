@@ -575,7 +575,7 @@ function buildShareText({ time, moves, pairs }) {
     const url  = currentPageLink();
     const shareData = { title: 'Match the Pack', text, url };
 	
-	let wintitle = getRandomSlogan();
+	let wintitles = getRandomSlogan();
 
     const btnNative = document.getElementById('shareNative');
     const btnCopy   = document.getElementById('shareCopy');
@@ -592,7 +592,7 @@ function buildShareText({ time, moves, pairs }) {
 	
 	  // 🆕 Pick a random slogan and display it
   const winTitle = document.querySelector('#win .win-title');
-  if (winTitle) winTitle.textContent = wintitle;
+  if (winTitle) winTitle.textContent = wintitles;
 
     stopTimer();
     winDlg.showModal();
