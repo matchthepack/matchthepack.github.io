@@ -359,6 +359,36 @@ header{
   border-top: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Start captions hidden */
+.card-figure figcaption {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .25s ease, transform .25s ease;
+  will-change: opacity, transform;
+}
+
+/* When the card is flipped (front visible), reveal caption */
+.card.flipped .card-figure figcaption,
+.card.matched .card-figure figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optional: tiny delay so image appears first, then caption */
+.card.flipped .card-figure figcaption {
+  transition-delay: .08s;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-figure figcaption {
+    transition: none;
+    opacity: 1;            /* always visible to avoid motion */
+    transform: none;
+  }
+}
+
+
 </style>
 
 </head>
