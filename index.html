@@ -348,8 +348,18 @@ function getOrCreateUsername() {
   const KEY = 'mtp_username';
   let name = localStorage.getItem(KEY);
   if (!name) {
-    const adjectives = ["Swift", "Mighty", "Clever", "Brave", "Silent", "Wild", "Lone", "Sneaky", "Fierce", "Lucky"];
-    const nouns = ["Wolf", "Howler", "Runner", "Shadow", "Hunter", "Alpha", "Cub", "Chaser", "Guardian", "Pup"];
+    const adjectives = [
+  "Swift", "Mighty", "Clever", "Brave", "Silent", "Wild", "Lone", "Sneaky", "Fierce", "Lucky",
+  "Proud", "Loyal", "Bold", "Fearless", "Noble", "Rowdy", "True", "Relentless", "United", "Spirited",
+  "Gritty", "Savage", "Strong", "Howling", "Tenacious", "Lively", "Alpha", "Alpha-Strong", "Daring", "Epic"
+];
+
+const nouns = [
+  "Wolf", "Howler", "Runner", "Shadow", "Hunter", "Alpha", "Cub", "Chaser", "Guardian", "Pup",
+  "Leader", "Packmate", "Striker", "Scout", "Fang", "Claw", "Trailblazer", "Howl", "Defender", "Spirit",
+  "Champion", "Ranger", "Tracker", "Storm", "Luna", "Echo", "Prowler", "Sentry", "Blaze", "Roamer"
+];
+
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const noun = nouns[Math.floor(Math.random() * nouns.length)];
     const num = Math.floor(Math.random() * 999); // adds uniqueness
