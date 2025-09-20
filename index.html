@@ -216,9 +216,9 @@
 /* Image fill + caption (safety repeat) */
 .face.front{ display:block !important; }
 .card-figure{ position: relative !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
-.card-figure img{ position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+.card-figure img{ position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
 .card-figure figcaption{
-  position: absolute !important; left: 0; right: 0; bottom: 0;
+  position: fixed !important; left: 0; right: 0; bottom: 0;
   padding: 4px 6px; font-size: .8em; font-weight: 600;
   background: rgba(0,0,0,.65); color: #fff; text-align: center; line-height: 1.2;
   backdrop-filter: blur(2px);
