@@ -326,6 +326,36 @@ header{
     padding: 10px 16px;
   }
 }
+.card-figure {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-figure figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 6px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: rgba(0,0,0,0.65);  /* dark semi-transparent background */
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  backdrop-filter: blur(2px);
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
 </style>
 
 </head>
@@ -580,29 +610,36 @@ if (toggleStatsBtn) {
     return shuffle(doubled);
   }
 
-  function renderDeck(){
-    grid.innerHTML='';
-    for(const card of deck){
-      const el=document.createElement('button');
-      el.className='card focusable'; el.type='button';
-      el.setAttribute('data-id',card.id);
-      el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
+function renderDeck(){
+  grid.innerHTML='';
+  for(const card of deck){
+    const el=document.createElement('button');
+    el.className='card focusable';
+    el.type='button';
+    el.setAttribute('data-id',card.id);
+    el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
 
-      const alt = (card.img.alt || '').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      const titleAttr = alt ? `title="${alt}"` : '';
+    const captionText = escapeHtml(card.img.title || card.img.alt || '');
 
-      el.innerHTML=`
-        <div class="inner">
-          <div class="face back"><img class="logo" src="${LOGO_URL}" alt="School logo" loading="lazy" decoding="async"></div>
-          <div class="face front">
-            <img ${titleAttr} alt="${alt}" src="${card.img.url}" loading="lazy" decoding="async" fetchpriority="low">
-          </div>
-        </div>`;
-      el.addEventListener('click',()=>flipCard(el,card), { passive:true });
-      el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
-      grid.appendChild(el);
-    }
+    el.innerHTML=`
+      <div class="inner">
+        <div class="face back">
+          <img class="logo" src="${LOGO_URL}" alt="School logo">
+        </div>
+        <div class="face front">
+          <figure class="card-figure">
+            <img src="${card.img.url}" alt="${captionText}">
+            <figcaption>${captionText}</figcaption>
+          </figure>
+        </div>
+      </div>`;
+      
+    el.addEventListener('click',()=>flipCard(el,card));
+    el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
+    grid.appendChild(el);
   }
+}
+
 
   async function flipCard(el, card){
     if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
