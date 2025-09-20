@@ -41,10 +41,9 @@
   .stat{ background:#0d1528; border:1px solid #1b2942; border-radius:12px; padding:10px 12px }
   .stat .label{ font-size:12px; color:var(--muted) }
   .stat .val{ font-size:20px; font-weight:800 }
-  .best{ margin-top:10px; font-size:13px; color:var(--gold) }
   .tiny{ font-size:12px; color:var(--muted); margin-left:6px }
 
-  /* Responsive grid: auto-fit cards nicely */
+  /* Responsive grid */
   .grid{
     display:grid; gap:10px;
     grid-template-columns: repeat(auto-fit, minmax(min(28vw, 130px), 1fr));
@@ -52,7 +51,7 @@
 
   .card{
     position:relative; height:0; padding-bottom:100%; perspective:1000px; border-radius:14px; overflow:hidden;
-    contain:layout paint size; /* perf hint */
+    contain:layout paint size;
   }
   .inner{
     position:absolute; inset:0; transform-style:preserve-3d; border-radius:14px;
@@ -98,66 +97,19 @@
     content:""; width:28px; height:28px; margin-left:10px; border:3px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%;
     display:inline-block; animation:spin 1s linear infinite; vertical-align:middle;
   }
-#loadingOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.9);
-  color: #fff;
-  display: flex;
-  flex-direction: column; /* stack logo above text on phones */
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  text-align: center;
-  padding: 20px;
-}
-
-#loadingOverlay .loading-logo {
-  width: 80px;
-  height: auto;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
-}
-
-/* Base link look */
-.link-control {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
-}
-.link-control:hover, .link-control:focus { text-decoration: underline }
-
-/* Visibility helpers */
-.mobile-only { display: none; }
-.desktop-only { display: inline-flex; }
-
-/* Hide Pairs dropdown and show bottom links on mobile */
-@media (max-width: 640px){
-  #pairsWrap { display: none; }           /* hide the Pairs control */
-  .desktop-only { display: none; }        /* hide header links */
-  .mobile-only { display: inline-flex; }  /* show footer links */
-  .mobile-links { gap: 8px; }
-}
-
-/* (Keep your existing mobile grid/panel CSS as you fixed earlier) */
-
-
-@media (min-width: 480px){
   #loadingOverlay {
-    flex-direction: row; /* side-by-side on bigger screens */
-    gap: 14px;
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700; z-index: 9999; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease; text-align: center; padding: 20px;
   }
   #loadingOverlay .loading-logo {
-    margin-bottom: 0;
+    width: 80px; height: auto; margin-bottom: 12px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
   }
-}
-
+  @media (min-width: 480px){
+    #loadingOverlay { flex-direction: row; gap: 14px; }
+    #loadingOverlay .loading-logo { margin-bottom: 0; }
+  }
   @keyframes spin{ to{ transform:rotate(360deg) } }
 
   .share-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
@@ -165,175 +117,45 @@
   .btn.ghost{ background:transparent }
   .btn:disabled{ opacity:.6; cursor:not-allowed }
 
- /* Mobile tweaks */
-@media (max-width: 900px){
-  header { gap: 10px }
-  .controls { width: 100%; justify-content: space-between }
-}
-
-/* === SINGLE mobile block (≤640px) === */
-@media (max-width: 640px){
-  /* Text links visible on mobile */
-  .mobile-only { display: inline-flex; align-items: center; }
-
-  /* Hide desktop-only header links on mobile (if you use them) */
-  .desktop-only { display: none; }
-
-  /* Hide the Pairs dropdown on mobile */
-  #pairsWrap { display: none; }
-
-  /* Collapse the side panel by default; toggle via .show-stats on <body> */
-  aside.panel { display: none; }
-  body.show-stats aside.panel { display: block; animation: slideDown .18s ease-out both; }
-
-  /* ✅ Force exactly 3 columns + breathing room + comfy taps */
-  .grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 12px;        /* slightly larger gap feels nicer */
-    padding: 4px;     /* prevents cards touching screen edges */
+  /* Mobile tweaks */
+  @media (max-width: 900px){
+    header { gap: 10px }
+    .controls { width: 100%; justify-content: space-between }
   }
-  .card { border-radius: 16px; }
-
-  /* Title scale for small screens */
-  .title { font-size: clamp(18px, 5vw, 24px) }
-
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
+  @media (max-width: 640px){
+    .mobile-only { display: inline-flex; align-items: center; }
+    .desktop-only { display: none; }
+    #pairsWrap { display: none; }
+    aside.panel { display: none; }
+    body.show-stats aside.panel { display: block; animation: slideDown .18s ease-out both; }
+    .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px; padding: 4px; }
+    .card { border-radius: 16px; }
+    .title { font-size: clamp(18px, 5vw, 24px) }
+    @keyframes slideDown { from {opacity:0; transform: translateY(-4px)} to {opacity:1; transform:none} }
   }
-}
-
-/* Very narrow phones (optional fine-tune) */
-@media (max-width: 400px){
-  .grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 8px;               /* slightly tighter gap here */
-    padding: 2px;
+  @media (max-width: 400px){
+    .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 2px; }
   }
-}
-
-/* Loading overlay text scales down a bit on phones */
-@media (max-width: 480px){
-  #loadingOverlay { font-size: 18px }
-}
-/* Base link style for mobile controls */
-.link-control {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
-  margin-left: 8px;
-}
-
-.link-control:hover,
-.link-control:focus {
-  text-decoration: underline;
-}
-
-/* Hide on desktop (buttons stay visible there if you want) */
-@media (min-width: 641px) {
-  .link-control.mobile-only { display: none; }
-}
-/* === Improve tap targets when zoom is disabled === */
-@media (max-width: 480px){
-  /* Slightly bigger buttons */
-  button, .btn, select {
-    padding: 12px 16px;
-    font-size: 1rem;
-    border-radius: 12px;
+  @media (max-width: 480px){
+    #loadingOverlay { font-size: 18px }
   }
 
-  /* Slightly bigger cards for easier tapping */
-  .grid {
-    gap: 8px;
-  }
-  .card {
-    border-radius: 16px;
-  }
+  /* Header layout */
+  header{ max-width:1100px; width:92vw; margin:18px auto 10px; display:grid; grid-template-columns: 1fr auto; align-items:center; gap:10px; }
+  .controls{ display:flex; align-items:center; gap:12px; flex-wrap:nowrap; }
+  .desktop-only{ display:inline-flex; } .mobile-only{ display:none; }
+  @media (max-width:640px){ header{ grid-template-columns: 1fr auto; gap:8px } .controls{ gap:8px } }
 
-  /* Share & footer links larger for easier tap */
-  .link-control {
-    font-size: 1rem;
-    padding: 4px 6px;
-  }
-}
-/* Header bar: title left, controls right */
-header{
-  max-width:1100px; width:92vw; margin:18px auto 10px;
-  display:grid; grid-template-columns: 1fr auto; align-items:center; gap:10px;
-}
+  /* Leaderboard styles */
+  #leaderboard { margin-top: 10px; font-size: 13px; color: var(--gold); }
+  #leaderboard strong { color: #ffd479; }
+  #leaderboard ol { margin: 8px 0 0 20px; padding: 0 }
+  #leaderboard li { color: var(--ink); margin: 2px 0; }
 
-/* Keep title/logo inline and strong */
-.title{
-  display:flex; align-items:center; gap:6px;
-  font-size:clamp(22px,3.2vw,30px); font-weight:800; letter-spacing:.4px; white-space:nowrap;
-}
-.title img{ height:.9em; width:auto; vertical-align:middle; flex-shrink:0 }
-
-.slogan{ grid-column:1 / -1; font-size:14px; font-weight:500; color:var(--muted); margin:-4px 0 0 0 }
-
-/* Controls row sits to the right of the title on desktop */
-.controls{
-  display:flex; align-items:center; gap:12px; flex-wrap:nowrap;
-}
-
-/* Link style */
-.link-control{
-  color:var(--accent); text-decoration:none; font-weight:600; font-size:15px;
-}
-.link-control:hover, .link-control:focus{ text-decoration:underline }
-
-/* Visibility helpers */
-.desktop-only{ display:inline-flex; }
-.mobile-only{ display:none; }
-
-/* ===== Mobile (≤640px) ===== */
-@media (max-width:640px){
-  /* Make header a single row: title left, New Game right */
-  header{ grid-template-columns: 1fr auto; gap:8px }
-
-  /* Hide pairs + desktop links on mobile */
-  #pairsWrap{ display:none }
-  .desktop-only{ display:none }
-  .mobile-only{ display:inline-flex }
-
-  /* Keep only New Game in the header controls */
-  .controls{ gap:8px }
-
-  /* Title size on phones */
-  .title{ font-size: clamp(18px, 5vw, 24px) }
-}
-</style>
-	<style>
-/* --- FINAL OVERRIDES --- */
-@media (max-width: 640px){
-  /* Force exactly 3 columns + comfy gap */
-  .grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 12px;
-    padding: 4px;
-  }
-
-  /* Hide pairs dropdown on mobile */
-  #pairsWrap { display: none !important; }
-
-  /* Hide desktop links */
-  .desktop-only { display: none !important; }
-
-  /* Make New Game button stand out on mobile */
-  #newGame {
-    font-size: 1rem;
-    padding: 10px 16px;
-  }
-}
-.card-figure {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: hidden;
-}
-
+  /* --- FINAL FIXES: image fill + caption reveal --- */
+  .face.front { display: block !important; } /* stop flex constraints */
+  .card-figure { position: relative; width: 100%; height: 100%; display: block; overflow: hidden; }
+  
 .card-figure img {
   position: fixed;
   inset: 0;
@@ -358,39 +180,13 @@ header{
   backdrop-filter: blur(2px);
   border-top: 1px solid rgba(255,255,255,0.2);
 }
-
-/* Start captions hidden */
-.card-figure figcaption {
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity .25s ease, transform .25s ease;
-  will-change: opacity, transform;
-}
-
-/* When the card is flipped (front visible), reveal caption */
-.card.flipped .card-figure figcaption,
-.card.matched .card-figure figcaption {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Optional: tiny delay so image appears first, then caption */
-.card.flipped .card-figure figcaption {
-  transition-delay: .08s;
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .card-figure figcaption {
-    transition: none;
-    opacity: 1;            /* always visible to avoid motion */
-    transform: none;
+  .card.flipped .card-figure figcaption,
+  .card.matched .card-figure figcaption { opacity:1; transform:translateY(0) }
+  .card.flipped .card-figure figcaption { transition-delay: .08s; }
+  @media (prefers-reduced-motion: reduce){
+    .card-figure figcaption { transition:none; opacity:1; transform:none; }
   }
-}
-
-
 </style>
-
 </head>
 <body>
 <header>
@@ -407,43 +203,45 @@ header{
       </select>
     </label>
 
-    <!-- Desktop-only links on the right of the title -->
     <a href="#" id="toggleStats" class="link-control desktop-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</a>
     <a href="#" id="showHow" class="link-control desktop-only" title="How to play">❔ How to Play</a>
- <label class="muted" title="If off, placeholders are used" style="display: none;">
-        <input id="useRS" type="checkbox" checked="">
-        Use rs-wolves.com photos
-      </label>
-    <!-- New Game stays visible on both desktop & mobile (top-right) -->
+
+    <label class="muted" title="If off, placeholders are used" style="display:none">
+      <input id="useRS" type="checkbox" checked> Use rs-wolves.com photos
+    </label>
+
     <button id="newGame" class="primary">New Game</button>
   </div>
 </header>
 
+<main>
+  <aside class="panel">
+    <h3 style="margin:6px 4px 10px">Dashboard</h3>
+    <div class="stats">
+      <div class="stat"><div class="label">Time</div><div id="time" class="val">00:00</div></div>
+      <div class="stat"><div class="label">Moves</div><div id="moves" class="val">0</div></div>
+      <div class="stat"><div class="label">Matches</div><div id="matches" class="val">0</div></div>
+      <div class="stat"><div class="label">Streak</div><div id="streak" class="val">0</div></div>
+    </div>
 
-  <main>
-    <aside class="panel">
-      <h3 style="margin:6px 4px 10px">Dashboard</h3>
-      <div class="stats">
-        <div class="stat"><div class="label">Time</div><div id="time" class="val">00:00</div></div>
-        <div class="stat"><div class="label">Moves</div><div id="moves" class="val">0</div></div>
-        <div class="stat"><div class="label">Matches</div><div id="matches" class="val">0</div></div>
-        <div class="stat"><div class="label">Streak</div><div id="streak" class="val">0</div></div>
-      </div>
-      <div id="best" class="best"></div>
-      <div class="tiny">When game is over, hover on desktop to see image description.</div>
-    </aside>
+    <!-- 🔥 Firebase Leaderboard replaces local "best" -->
+    <div id="leaderboard" class="best">
+      <strong>Top Times</strong> <span id="lbPairs"></span>
+      <ol id="lbList"></ol>
+    </div>
 
-    <section id="statsPanel" class="panel">
-      <div id="grid" class="grid" aria-label="Memory game grid"></div>
-    </section>
-  </main>
+    <div class="tiny">When game is over, hover on desktop to see image description.</div>
+  </aside>
 
- <footer>
-  <div style="display: none;">How to Play: Flip cards to reveal photos and match pairs of identical images. Match all pairs to win!</div>
+  <section id="statsPanel" class="panel">
+    <div id="grid" class="grid" aria-label="Memory game grid"></div>
+  </section>
+</main>
+
+<footer>
+  <div style="display:none">How to Play: Flip cards to reveal photos and match pairs of identical images. Match all pairs to win!</div>
   <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
     <a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none">↻ Restart</a>
-
-    <!-- Mobile-only links here -->
     <span class="mobile-links mobile-only">
       · <a href="#" id="toggleStatsMobile" class="link-control">📊 Stats</a>
       · <a href="#" id="showHowMobile" class="link-control">❔ How to Play</a>
@@ -451,60 +249,55 @@ header{
   </div>
 </footer>
 
+<dialog id="win">
+  <p class="win-title">🏆 You ran with the Wolves!</p>
+  <div class="win-grid">
+    <div class="stat"><div class="label">Time</div><div id="winTime" class="val">—</div></div>
+    <div class="stat"><div class="label">Moves</div><div id="winMoves" class="val">—</div></div>
+    <div class="stat"><div class="label">Status</div><div id="winBest" class="val">—</div></div>
+  </div>
+  <div class="share-row">
+    <button id="shareNative" class="share btn">🔗 Share</button>
+    <button id="shareCopy" class="share btn ghost" style="display:none">📋 Copy link</button>
+    <a id="shareX" class="share btn ghost" target="_blank" rel="noopener">𝕏 Post</a>
+    <a id="shareFB" class="share btn ghost" target="_blank" rel="noopener">Facebook</a>
+    <a id="shareEmail" class="share btn ghost">Email</a>
+  </div>
+  <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px">
+    <form method="dialog"><button class="ghost">Close</button></form>
+    <button id="playAgain" class="primary">Play Again</button>
+  </div>
+</dialog>
 
-  <dialog id="win">
-    <p class="win-title">🏆You ran with the Wolves!</p>
-    <div class="win-grid">
-      <div class="stat"><div class="label">Time</div><div id="winTime" class="val">—</div></div>
-      <div class="stat"><div class="label">Moves</div><div id="winMoves" class="val">—</div></div>
-      <div class="stat"><div class="label">Best</div><div id="winBest" class="val">—</div></div>
-    </div>
-    <div class="share-row">
-      <button id="shareNative" class="share btn">🔗 Share</button>
-	  <button id="shareCopy" class="share btn ghost" style="display: none;">📋 Copy link</button>
-      <a id="shareX" class="share btn ghost" target="_blank" rel="noopener">𝕏 Post</a>
-      <a id="shareFB" class="share btn ghost" target="_blank" rel="noopener">Facebook</a>
-      <a id="shareEmail" class="share btn ghost">Email</a>
-    </div>
-    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px">
-      <form method="dialog"><button class="ghost">Close</button></form>
-      <button id="playAgain" class="primary">Play Again</button>
-    </div>
-  </dialog>
+<dialog id="how">
+  <p class="win-title">How to Play</p>
+  <div class="muted" style="line-height:1.6">
+    Flip two cards. If the photos match, they stay face-up. If not, they flip back.
+    Clear the board with the fewest moves in the fastest time!
+  </div>
+  <form method="dialog" style="margin-top:12px"><button class="primary">Got it</button></form>
+</dialog>
 
-  <dialog id="how">
-    <p class="win-title">How to Play</p>
-    <div class="muted" style="line-height:1.6">
-      Flip two cards. If the photos match, they stay face-up. If not, they flip back.
-      Clear the board with the fewest moves in the fastest time!
-    </div>
-    <form method="dialog" style="margin-top:12px"><button class="primary">Got it</button></form>
-  </dialog>
-    <div id="loadingOverlay">
+<div id="loadingOverlay">
   <img src="logo.png" alt="RS Wolves Logo" class="loading-logo">
   <span>...Loading the Pack!</span>
 </div>
 
 <script>
-  const LOGO_URL = 'logo.png'; // or absolute URL
+  const LOGO_URL = 'logo.png';
 
-		const WIN_SLOGANS = [
-  "You Ran With the Wolves!",
-  "You Matched the Pack!",
-  "Alpha of the Pack!",
-  "Leader of the Pack!",
-  "Perfect Hunt! You Matched Them All!",
-  "You’re the Top Dog!",
-  "The Pack Cheers for You!"
-];
+  const WIN_SLOGANS = [
+    "You Ran With the Wolves!",
+    "You Matched the Pack!",
+    "Alpha of the Pack!",
+    "Leader of the Pack!",
+    "Perfect Hunt! You Matched Them All!",
+    "You’re the Top Dog!",
+    "The Pack Cheers for You!"
+  ];
+  function getRandomSlogan(){ return WIN_SLOGANS[Math.floor(Math.random()*WIN_SLOGANS.length)] }
 
-function getRandomSlogan() {
-  return WIN_SLOGANS[Math.floor(Math.random() * WIN_SLOGANS.length)];
-}
-
-  /* ===============================
-     RS Wolves fetcher (via Cloudflare Worker proxy)
-     =============================== */
+  /* ========== Apptegy fetcher via CF Worker ========== */
   async function fetchApptegyImages({ roots=["/live-feed"], pages=2, limit=50 } = {}){
     const ORIGIN = "https://www.rs-wolves.com";
     const IMG_CDNS = ["core-docs.s3.amazonaws.com","cmsv2-assets.apptegy.net"];
@@ -519,7 +312,6 @@ function getRandomSlogan() {
       return new DOMParser().parseFromString(html, "text/html");
     }
     const textTrim = s => (s||"").replace(/\s+/g," ").trim();
-
 
     function extractContext(imgEl){
       let node = imgEl;
@@ -540,11 +332,7 @@ function getRandomSlogan() {
       }
       return { caption:textTrim(caption), description:postText, date: dateISO || textTrim(dateText) };
     }
-    const guessMime = u => {
-      const m = (u||"").toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(?:\?|#|$)/);
-      if(!m) return "image/*";
-      return `image/${m[1]==="jpg"?"jpeg":m[1]}`;
-    };
+    const guessMime = u => { const m=(u||"").toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(?:\?|#|$)/); return m ? `image/${m[1]==="jpg"?"jpeg":m[1]}` : "image/*" };
 
     const results=[]; const seen=new Set();
     for(const root of roots){
@@ -569,9 +357,7 @@ function getRandomSlogan() {
     return results;
   }
 
-  /* ===============================
-     Placeholders
-     =============================== */
+  /* ========== Placeholders ========== */
   function getPlaceholderImages(n){
     const seed = Date.now().toString(36);
     return Array.from({length:n}, (_,i)=> ({
@@ -582,33 +368,20 @@ function getRandomSlogan() {
     }));
   }
 
-  /* ===============================
-     Game Logic
-     =============================== */
+  /* ========== Game Logic ========== */
   const $ = s => document.querySelector(s);
   const grid = $('#grid');
-  const timeEl = $('#time'), movesEl = $('#moves'), matchesEl = $('#matches'), streakEl = $('#streak'), bestEl = $('#best');
+  const timeEl = $('#time'), movesEl = $('#moves'), matchesEl = $('#matches'), streakEl = $('#streak');
   const pairsSel = $('#pairs'), newBtn = $('#newGame'), restartLink = $('#restartLink');
   const winDlg = $('#win'), howDlg = $('#how'), showHowBtn = $('#showHow'), playAgainBtn = $('#playAgain');
   const useRS = $('#useRS');
-  
-  const toggleStatsBtn = document.getElementById('toggleStats');
 
-if (toggleStatsBtn) {
-  toggleStatsBtn.addEventListener('click', () => {
+  const toggleStatsBtn = document.getElementById('toggleStats');
+  toggleStatsBtn?.addEventListener('click', () => {
     const on = document.body.classList.toggle('show-stats');
     toggleStatsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
-
-    // If opening on mobile, scroll it into view
-    if (on) {
-      const panel = document.getElementById('statsPanel');
-      panel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-}
-
-
-
 
   function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
   function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
@@ -619,20 +392,17 @@ if (toggleStatsBtn) {
 
   function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
   function fmtTime(s){ const m=String(Math.floor(s/60)).padStart(2,'0'); const sec=String(s%60).padStart(2,'0'); return `${m}:${sec}` }
+  window.fmtTime = fmtTime; // expose for module
   function startTimer(){ stopTimer(); timer=setInterval(()=>{ seconds++; timeEl.textContent=fmtTime(seconds) },1000) }
   function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
   function resetStats(){ seconds=0;moves=0;matches=0;streak=0; timeEl.textContent='00:00'; movesEl.textContent='0'; matchesEl.textContent='0'; streakEl.textContent='0' }
 
   function setGridColumns(pairCount){
-    // On small screens, let CSS auto-fit handle it responsively
     if (window.innerWidth <= 640) return;
     const map={6:'repeat(4,1fr)',8:'repeat(4,1fr)',10:'repeat(5,1fr)',12:'repeat(6,1fr)'};
     grid.style.gridTemplateColumns = map[pairCount] || 'repeat(4,1fr)';
   }
   window.addEventListener('resize', ()=> setGridColumns(parseInt(pairsSel.value,10)));
-
-  function bestKey(){ return `best_${totalPairs}` } function getBest(){ return JSON.parse(localStorage.getItem(bestKey())||'null') } function setBest(o){ localStorage.setItem(bestKey(), JSON.stringify(o)) }
-  function showBest(){ const b=getBest(); bestEl.textContent = b ? `Best ${totalPairs} pairs → ${fmtTime(b.time)} • ${b.moves} moves` : '' }
 
   function buildDeck(images, pairCount){
     const uniq = images.slice(0, pairCount);
@@ -642,48 +412,38 @@ if (toggleStatsBtn) {
     ]);
     return shuffle(doubled);
   }
-  
-  function escapeHtml(str) {
-  return (str || '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  }[c]));
-}
 
-
-function renderDeck(){
-  grid.innerHTML='';
-  for(const card of deck){
-    const el=document.createElement('button');
-    el.className='card focusable';
-    el.type='button';
-    el.setAttribute('data-id',card.id);
-    el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
-
-    const captionText = escapeHtml(card.img.title || card.img.alt || '');
-
-    el.innerHTML=`
-      <div class="inner">
-        <div class="face back">
-          <img class="logo" src="${LOGO_URL}" alt="School logo">
-        </div>
-        <div class="face front">
-          <figure class="card-figure">
-            <img src="${card.img.url}" alt="${captionText}">
-            <figcaption>${captionText}</figcaption>
-          </figure>
-        </div>
-      </div>`;
-      
-    el.addEventListener('click',()=>flipCard(el,card));
-    el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
-    grid.appendChild(el);
+  function escapeHtml(str){
+    return (str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-}
 
+  function renderDeck(){
+    grid.innerHTML='';
+    for(const card of deck){
+      const el=document.createElement('button');
+      el.className='card focusable';
+      el.type='button';
+      el.setAttribute('data-id',card.id);
+      el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
+
+      const captionText = escapeHtml(card.img.title || card.img.alt || '');
+      el.innerHTML=`
+        <div class="inner">
+          <div class="face back">
+            <img class="logo" src="${LOGO_URL}" alt="School logo">
+          </div>
+          <div class="face front">
+            <figure class="card-figure">
+              <img src="${card.img.url}" alt="${captionText}">
+              <figcaption>${captionText}</figcaption>
+            </figure>
+          </div>
+        </div>`;
+      el.addEventListener('click',()=>flipCard(el,card));
+      el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
+      grid.appendChild(el);
+    }
+  }
 
   async function flipCard(el, card){
     if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
@@ -702,30 +462,25 @@ function renderDeck(){
       first=second=null; lock=false;
     }
   }
-  
 
-
-function buildShareText({ time, moves, pairs }) {
-  return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
-}
+  function buildShareText({ time, moves, pairs }) {
+    return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
+  }
   function currentPageLink(){ return location.href.split('#')[0]; }
   async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); alert('Link copied!') } catch{ prompt('Copy this link:', text) } }
 
-  function announceWin(){
-    const b=getBest(); const cur={time:seconds,moves};
-    let bestText='—';
-    if(!b || cur.time<b.time || (cur.time===b.time && cur.moves<b.moves)){ setBest(cur); bestText=`New Best! ${fmtTime(cur.time)} • ${cur.moves} moves`; }
-    else { bestText=`Best: ${fmtTime(b.time)} • ${b.moves} moves`; }
-    $('#winTime').textContent = fmtTime(seconds);
-    $('#winMoves').textContent = moves;
-    $('#winBest').textContent = bestText;
+  // Simple anonymous device id
+  const USER_ID = localStorage.getItem('mtpack_uid') || (() => {
+    const id = (crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2)));
+    localStorage.setItem('mtpack_uid', id);
+    return id;
+  })();
 
+  function announceWin(){
     const pairs = totalPairs;
     const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
     const url  = currentPageLink();
     const shareData = { title: 'Match the Pack', text, url };
-	
-	let wintitles = getRandomSlogan();
 
     const btnNative = document.getElementById('shareNative');
     const btnCopy   = document.getElementById('shareCopy');
@@ -733,100 +488,75 @@ function buildShareText({ time, moves, pairs }) {
     const aFB       = document.getElementById('shareFB');
     const aEmail    = document.getElementById('shareEmail');
 
+    document.querySelector('#win .win-title').textContent = getRandomSlogan();
+    $('#winTime').textContent = fmtTime(seconds);
+    $('#winMoves').textContent = moves;
+    $('#winBest').textContent = 'Submitting...';
+
     if (navigator.share) { btnNative.disabled=false; btnNative.onclick=()=>navigator.share(shareData).catch(()=>{}); }
     else { btnNative.disabled=true; }
     btnCopy.onclick = () => copyToClipboard(url);
     aX.href  = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
     aFB.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
     aEmail.href = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') + '&body=' + encodeURIComponent(text + '\n\n' + url);
-	
-	  // 🆕 Pick a random slogan and display it
-  const winTitle = document.querySelector('#win .win-title');
-  if (winTitle) winTitle.textContent = wintitles;
+
+    // 🔥 Save score in Firebase & refresh leaderboard
+    window.saveScoreToFirebase?.({ userId: USER_ID, timeSec: seconds, moves, pairs: totalPairs })
+      .then(()=> { $('#winBest').textContent = 'Saved!'; })
+      .catch(()=> { $('#winBest').textContent = 'Saved locally'; })
+      .finally(()=> { window.refreshLeaderboard?.(totalPairs); });
 
     stopTimer();
     winDlg.showModal();
   }
-  
-  function isMobile() {
-  return window.matchMedia('(max-width: 640px)').matches;
-}
 
-// Disable pair options > 6 on mobile; re-enable on desktop
-function updatePairsForViewport() {
-  const opts = Array.from(pairsSel.options);
-  const mobile = isMobile();
-  for (const o of opts) {
-    const pairs = parseInt(o.value, 10);
-    o.disabled = mobile && pairs > 6;        // disable >6 pairs on mobile
+  function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+  function updatePairsForViewport(){
+    if (!pairsSel) return;
+    const mobile = isMobile();
+    if (mobile) { if (parseInt(pairsSel.value, 10) > 6) pairsSel.value = '6'; pairsSel.disabled = true; }
+    else { pairsSel.disabled = false; }
   }
-  // If current selection is too big for mobile, snap it to 6
-  if (mobile && parseInt(pairsSel.value, 10) > 6) {
-    pairsSel.value = '6';
-  }
-}
-
-function isMobile() {
-  return window.matchMedia('(max-width: 640px)').matches;
-}
-
-function updatePairsForViewport() {
-  const mobile = isMobile();
-  if (!pairsSel) return;
-
-  // Limit to 6 pairs (12 cards) on mobile
-  if (mobile) {
-    // Hide in CSS, but also enforce selection
-    if (parseInt(pairsSel.value, 10) > 6) pairsSel.value = '6';
-    pairsSel.disabled = true;
-  } else {
-    pairsSel.disabled = false;
-  }
-}
-
-
 
   const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
 
-async function newGame() {
-  showLoading();
-  const minLoad = new Promise(r => setTimeout(r, 3000));
+  async function newGame() {
+    showLoading();
+    const minLoad = new Promise(r => setTimeout(r, 3000));
 
-  updatePairsForViewport();
-  stopTimer();
-  resetStats();
-  winDlg.close();
-  totalPairs = parseInt(pairsSel.value, 10);
-  setGridColumns(totalPairs);
-  showBest();
+    updatePairsForViewport();
+    stopTimer(); resetStats(); winDlg.close();
+    totalPairs = parseInt(pairsSel.value, 10);
+    setGridColumns(totalPairs);
 
-  let images = [];
-  const shouldUseRS = useRS ? useRS.checked : false; // ✅ safe check
-
-  if (shouldUseRS) {
-    try {
-      const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
-      images = rsImgs.filter(x => x && x.url);
-      if (images.length < totalPairs) {
-        const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
-        images = images.concat(more);
+    let images = [];
+    const shouldUseRS = useRS ? useRS.checked : false;
+    if (shouldUseRS) {
+      try {
+        const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
+        images = rsImgs.filter(x => x && x.url);
+        if (images.length < totalPairs) {
+          const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
+          images = images.concat(more);
+        }
+        images = shuffle(images).slice(0, totalPairs);
+      } catch (err) {
+        console.warn('Apptegy fetch failed; using placeholders:', err);
+        images = getPlaceholderImages(totalPairs);
       }
-      images = shuffle(images).slice(0, totalPairs);
-    } catch (err) {
-      console.warn('Apptegy fetch failed; using placeholders:', err);
+    } else {
       images = getPlaceholderImages(totalPairs);
     }
-  } else {
-    images = getPlaceholderImages(totalPairs);
+
+    deck = buildDeck(images, totalPairs);
+    renderDeck();
+
+    // Refresh leaderboard for this board size
+    window.refreshLeaderboard?.(totalPairs);
+
+    await minLoad;
+    hideLoading();
   }
-
-  deck = buildDeck(images, totalPairs);
-  renderDeck();
-
-  await minLoad;
-  hideLoading();
-}
-
 
   newBtn.addEventListener('click', newGame, { passive:true });
   restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
@@ -834,53 +564,99 @@ async function newGame() {
   showHowBtn.addEventListener('click', ()=> howDlg.showModal());
   playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
 
-// 1) Run both updatePairsForViewport() and newGame() once DOM is ready
-window.addEventListener('DOMContentLoaded', () => {
-  updatePairsForViewport();
-  newGame();
-});
+  // DOM ready
+  window.addEventListener('DOMContentLoaded', () => { updatePairsForViewport(); newGame(); });
+  window.addEventListener('resize', updatePairsForViewport);
 
-// 2) Re-check pair options when screen size changes
-window.addEventListener('resize', updatePairsForViewport);
-// ✅ Add this after your other event listeners
-
-// Desktop header links
-document.getElementById('showHow')?.addEventListener('click', e => {
-  e.preventDefault();
-  howDlg.showModal();
-});
-document.getElementById('toggleStats')?.addEventListener('click', e => {
-  e.preventDefault();
-  const on = document.body.classList.toggle('show-stats');
-  e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
-  if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
-});
-
-// Mobile footer links
-document.getElementById('showHowMobile')?.addEventListener('click', e => {
-  e.preventDefault();
-  howDlg.showModal();
-});
-document.getElementById('toggleStatsMobile')?.addEventListener('click', e => {
-  e.preventDefault();
-  const on = document.body.classList.toggle('show-stats');
-  e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
-  if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
-});
-
-
-const toggleStatsLink = document.getElementById('toggleStats');
-if (toggleStatsLink) {
-  toggleStatsLink.addEventListener('click', e => {
+  // Desktop links
+  document.getElementById('showHow')?.addEventListener('click', e => { e.preventDefault(); howDlg.showModal(); });
+  document.getElementById('toggleStats')?.addEventListener('click', e => {
     e.preventDefault();
     const on = document.body.classList.toggle('show-stats');
-    toggleStatsLink.setAttribute('aria-expanded', on ? 'true' : 'false');
-    if (on) {
-      document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
   });
+
+  // Mobile links
+  document.getElementById('showHowMobile')?.addEventListener('click', e => { e.preventDefault(); howDlg.showModal(); });
+  document.getElementById('toggleStatsMobile')?.addEventListener('click', e => {
+    e.preventDefault();
+    const on = document.body.classList.toggle('show-stats');
+    e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>
+
+<!-- 🔥 Firebase Leaderboard (Firestore) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, orderBy, limit, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+/* 1) Replace with your Firebase project settings */
+const firebaseConfig = {
+  apiKey: "AIzaSyCHlFxGqnTQx9wmOqgMb7ZZuFwNFWkzXmA",
+  authDomain: "matchthepack.firebaseapp.com",
+  projectId: "matchthepack",
+  storageBucket: "matchthepack.firebasestorage.app",
+  messagingSenderId: "21156338314",
+  appId: "1:21156338314:web:22db281e81969b55fa2b73"
+};
+
+/* 2) Init Firestore */
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* 3) Save a score */
+async function saveScoreToFirebase({ userId, timeSec, moves, pairs }) {
+  try {
+    await addDoc(collection(db, "mtpack_scores"), {
+      userId, timeSec, moves, pairs,
+      createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("Score save failed:", e);
+    throw e;
+  }
 }
 
+/* 4) Load top scores per board size */
+async function refreshLeaderboard(pairs) {
+  try {
+    const listEl = document.getElementById('lbList');
+    const pairsEl = document.getElementById('lbPairs');
+    if (!listEl) return;
+
+    pairsEl.textContent = `(${pairs*2} cards)`;
+
+    const q = query(
+      collection(db, "mtpack_scores"),
+      where("pairs", "==", pairs),
+      orderBy("timeSec", "asc"),
+      orderBy("moves", "asc"),
+      limit(10)
+    );
+
+    const snap = await getDocs(q);
+    const rows = [];
+    let rank = 1;
+    snap.forEach(doc => {
+      const d = doc.data();
+      const timeText = (window.fmtTime ? window.fmtTime(d.timeSec) : d.timeSec + 's');
+      rows.push(`<li>${rank++}. ${timeText} — ${d.moves} moves</li>`);
+    });
+
+    listEl.innerHTML = rows.length ? rows.join("") : `<li>No scores yet — be first!</li>`;
+  } catch (e) {
+    console.warn("Leaderboard load failed:", e);
+  }
+}
+
+/* 5) Expose to window so non-module script can call */
+window.saveScoreToFirebase = saveScoreToFirebase;
+window.refreshLeaderboard  = refreshLeaderboard;
 </script>
 </body>
 </html>
