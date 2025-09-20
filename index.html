@@ -186,6 +186,48 @@
   @media (prefers-reduced-motion: reduce){
     .card-figure figcaption { transition:none; opacity:1; transform:none; }
   }
+  /* === FINAL MOBILE AUTHORITY (place at very end) === */
+@media (max-width: 640px){
+  /* 1) One-column layout + hidden sidebar by default */
+  main{ grid-template-columns: 1fr !important; gap: 12px !important; }
+  aside.panel{ display: none !important; }
+  body.show-stats aside.panel{ display: block !important; }
+
+  /* 2) Header: title left, New Game right */
+  header{ grid-template-columns: 1fr auto !important; gap: 8px !important; }
+
+  /* 3) Controls: only New Game in header; hide Pairs & desktop links */
+  #pairsWrap{ display: none !important; }
+  .desktop-only{ display: none !important; }
+  .mobile-only{ display: inline-flex !important; }
+
+  /* 4) Grid: ALWAYS 3 columns on phones */
+  .grid{
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    padding: 4px !important;
+  }
+
+  /* 5) Card aesthetics & tap comfort */
+  .card{ border-radius: 16px !important; }
+  .title{ font-size: clamp(18px, 5vw, 24px) !important; }
+}
+
+/* Image fill + caption (safety repeat) */
+.face.front{ display:block !important; }
+.card-figure{ position: relative !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
+.card-figure img{ position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+.card-figure figcaption{
+  position: absolute !important; left: 0; right: 0; bottom: 0;
+  padding: 4px 6px; font-size: .8em; font-weight: 600;
+  background: rgba(0,0,0,.65); color: #fff; text-align: center; line-height: 1.2;
+  backdrop-filter: blur(2px);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.card.flipped .card-figure figcaption,
+.card.matched .card-figure figcaption{ opacity:1; transform:translateY(0) }
+
 </style>
 </head>
 <body>
