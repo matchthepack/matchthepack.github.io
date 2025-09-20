@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a" />
 <title>Match the Pack — RS Wolves!</title>
 <style>
@@ -173,20 +173,30 @@
 
 /* === SINGLE mobile block (≤640px) === */
 @media (max-width: 640px){
-  /* Show Stats toggle on mobile */
+  /* Text links visible on mobile */
   .mobile-only { display: inline-flex; align-items: center; }
 
-  /* Collapse the side panel by default on phones */
+  /* Hide desktop-only header links on mobile (if you use them) */
+  .desktop-only { display: none; }
+
+  /* Hide the Pairs dropdown on mobile */
+  #pairsWrap { display: none; }
+
+  /* Collapse the side panel by default; toggle via .show-stats on <body> */
   aside.panel { display: none; }
-  body.show-stats aside.panel { display: block; }
+  body.show-stats aside.panel { display: block; animation: slideDown .18s ease-out both; }
 
-  /* ✅ Force exactly 3 columns on mobile */
-  .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+  /* ✅ Force exactly 3 columns + breathing room + comfy taps */
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px;        /* slightly larger gap feels nicer */
+    padding: 4px;     /* prevents cards touching screen edges */
+  }
+  .card { border-radius: 16px; }
 
+  /* Title scale for small screens */
   .title { font-size: clamp(18px, 5vw, 24px) }
 
-  /* Nice panel entrance */
-  aside.panel { animation: slideDown .18s ease-out both; }
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -195,7 +205,11 @@
 
 /* Very narrow phones (optional fine-tune) */
 @media (max-width: 400px){
-  .title { font-size: clamp(16px, 6vw, 20px) }
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px;               /* slightly tighter gap here */
+    padding: 2px;
+  }
 }
 
 /* Loading overlay text scales down a bit on phones */
@@ -220,53 +234,191 @@
 @media (min-width: 641px) {
   .link-control.mobile-only { display: none; }
 }
+/* === Improve tap targets when zoom is disabled === */
+@media (max-width: 480px){
+  /* Slightly bigger buttons */
+  button, .btn, select {
+    padding: 12px 16px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
 
-/* --- Photo caption overlay --- */
-.face.front { position: relative; } /* keep front face positioned for absolute caption */
-.card .caption {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 6px 8px;
-  font-size: 12px; line-height: 1.25; font-weight: 600;
-  color: #fff;
-  /* readable over photos */
-  background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.35), rgba(0,0,0,0));
-  /* clamp to two lines */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  pointer-events: none;  /* avoids intercepting clicks */
+  /* Slightly bigger cards for easier tapping */
+  .grid {
+    gap: 8px;
+  }
+  .card {
+    border-radius: 16px;
+  }
+
+  /* Share & footer links larger for easier tap */
+  .link-control {
+    font-size: 1rem;
+    padding: 4px 6px;
+  }
+}
+/* Header bar: title left, controls right */
+header{
+  max-width:1100px; width:92vw; margin:18px auto 10px;
+  display:grid; grid-template-columns: 1fr auto; align-items:center; gap:10px;
 }
 
+/* Keep title/logo inline and strong */
+.title{
+  display:flex; align-items:center; gap:6px;
+  font-size:clamp(22px,3.2vw,30px); font-weight:800; letter-spacing:.4px; white-space:nowrap;
+}
+.title img{ height:.9em; width:auto; vertical-align:middle; flex-shrink:0 }
+
+.slogan{ grid-column:1 / -1; font-size:14px; font-weight:500; color:var(--muted); margin:-4px 0 0 0 }
+
+/* Controls row sits to the right of the title on desktop */
+.controls{
+  display:flex; align-items:center; gap:12px; flex-wrap:nowrap;
+}
+
+/* Link style */
+.link-control{
+  color:var(--accent); text-decoration:none; font-weight:600; font-size:15px;
+}
+.link-control:hover, .link-control:focus{ text-decoration:underline }
+
+/* Visibility helpers */
+.desktop-only{ display:inline-flex; }
+.mobile-only{ display:none; }
+
+/* ===== Mobile (≤640px) ===== */
+@media (max-width:640px){
+  /* Make header a single row: title left, New Game right */
+  header{ grid-template-columns: 1fr auto; gap:8px }
+
+  /* Hide pairs + desktop links on mobile */
+  #pairsWrap{ display:none }
+  .desktop-only{ display:none }
+  .mobile-only{ display:inline-flex }
+
+  /* Keep only New Game in the header controls */
+  .controls{ gap:8px }
+
+  /* Title size on phones */
+  .title{ font-size: clamp(18px, 5vw, 24px) }
+}
 </style>
+	<style>
+/* --- FINAL OVERRIDES --- */
+@media (max-width: 640px){
+  /* Force exactly 3 columns + comfy gap */
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px;
+    padding: 4px;
+  }
+
+  /* Hide pairs dropdown on mobile */
+  #pairsWrap { display: none !important; }
+
+  /* Hide desktop links */
+  .desktop-only { display: none !important; }
+
+  /* Make New Game button stand out on mobile */
+  #newGame {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
+}
+.card-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+.card-figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* ✅ keeps full coverage */
+  display: block;
+}
+
+.card-figure figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 6px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  backdrop-filter: blur(2px);
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Start captions hidden */
+.card-figure figcaption {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .25s ease, transform .25s ease;
+  will-change: opacity, transform;
+}
+
+/* When the card is flipped (front visible), reveal caption */
+.card.flipped .card-figure figcaption,
+.card.matched .card-figure figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optional: tiny delay so image appears first, then caption */
+.card.flipped .card-figure figcaption {
+  transition-delay: .08s;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-figure figcaption {
+    transition: none;
+    opacity: 1;            /* always visible to avoid motion */
+    transform: none;
+  }
+}
+
+
+</style>
+
 </head>
 <body>
-  <header>
-    <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
-     <p class="slogan">...Run Together, Win Together!</p>
-<div class="controls">
-  <label id="pairsWrap">Pairs:
-    <select id="pairs">
-      <option value="6">12 cards</option>
-      <option value="8" selected>16 cards</option>
-      <option value="10">20 cards</option>
-      <option value="12">24 cards</option>
-    </select>
-  </label>
+<header>
+  <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
+  <p class="slogan">Sharpen your mind, run with the wolves!</p>
 
-  <!-- Desktop-only links in header -->
-  <a href="#" id="toggleStats" class="link-control desktop-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</a>
-  <a href="#" id="showHow" class="link-control desktop-only" title="How to play">❔ How to Play</a>
+  <div class="controls">
+    <label id="pairsWrap" class="desktop-only">Pairs:
+      <select id="pairs">
+        <option value="6">12 cards</option>
+        <option value="8" selected>16 cards</option>
+        <option value="10">20 cards</option>
+        <option value="12">24 cards</option>
+      </select>
+    </label>
+
+    <!-- Desktop-only links on the right of the title -->
+    <a href="#" id="toggleStats" class="link-control desktop-only" aria-expanded="false" aria-controls="statsPanel">📊 Stats</a>
+    <a href="#" id="showHow" class="link-control desktop-only" title="How to play">❔ How to Play</a>
  <label class="muted" title="If off, placeholders are used" style="display: none;">
         <input id="useRS" type="checkbox" checked="">
         Use rs-wolves.com photos
       </label>
-  <button id="newGame" class="primary">New Game</button>
-</div>
+    <!-- New Game stays visible on both desktop & mobile (top-right) -->
+    <button id="newGame" class="primary">New Game</button>
+  </div>
+</header>
 
-
-  </header>
 
   <main>
     <aside class="panel">
@@ -336,6 +488,20 @@
 <script>
   const LOGO_URL = 'logo.png'; // or absolute URL
 
+		const WIN_SLOGANS = [
+  "You Ran With the Wolves!",
+  "You Matched the Pack!",
+  "Alpha of the Pack!",
+  "Leader of the Pack!",
+  "Perfect Hunt! You Matched Them All!",
+  "You’re the Top Dog!",
+  "The Pack Cheers for You!"
+];
+
+function getRandomSlogan() {
+  return WIN_SLOGANS[Math.floor(Math.random() * WIN_SLOGANS.length)];
+}
+
   /* ===============================
      RS Wolves fetcher (via Cloudflare Worker proxy)
      =============================== */
@@ -353,6 +519,7 @@
       return new DOMParser().parseFromString(html, "text/html");
     }
     const textTrim = s => (s||"").replace(/\s+/g," ").trim();
+
 
     function extractContext(imgEl){
       let node = imgEl;
@@ -441,6 +608,8 @@ if (toggleStatsBtn) {
 }
 
 
+
+
   function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
   function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
 
@@ -473,42 +642,43 @@ if (toggleStatsBtn) {
     ]);
     return shuffle(doubled);
   }
+  
+  function escapeHtml(str) {
+  return (str || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+}
+
 
 function renderDeck(){
   grid.innerHTML='';
   for(const card of deck){
     const el=document.createElement('button');
-    el.className='card focusable'; el.type='button';
+    el.className='card focusable';
+    el.type='button';
     el.setAttribute('data-id',card.id);
+    el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
 
-    const altRaw = card.img.alt || card.img.title || 'Hidden photo';
-    const altEsc = altRaw.replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const titleAttr = altEsc ? `title="${altEsc}"` : '';
+    const captionText = escapeHtml(card.img.title || card.img.alt || '');
 
-    // pick best caption source
-    const captionText = (card.img.caption && card.img.caption.trim())
-      || (card.img.title && card.img.title.trim())
-      || (card.img.alt && card.img.alt.trim())
-      || '';
-
-    el.setAttribute('aria-label', altRaw);
-
-    el.innerHTML = `
+    el.innerHTML=`
       <div class="inner">
-        <!-- Back stays the same -->
         <div class="face back">
-          <img class="logo" src="${LOGO_URL}" alt="School logo" loading="lazy" decoding="async">
+          <img class="logo" src="${LOGO_URL}" alt="School logo">
         </div>
-
-        <!-- Front: photo + caption bar -->
         <div class="face front">
-          <img ${titleAttr} alt="${altEsc}" src="${card.img.url}" loading="lazy" decoding="async" fetchpriority="low">
-          ${captionText ? `<div class="caption">${captionText}</div>` : ``}
+          <figure class="card-figure">
+            <img src="${card.img.url}" alt="${captionText}">
+            <figcaption>${captionText}</figcaption>
+          </figure>
         </div>
-      </div>
-    `;
-
-    el.addEventListener('click',()=>flipCard(el,card), { passive:true });
+      </div>`;
+      
+    el.addEventListener('click',()=>flipCard(el,card));
     el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
     grid.appendChild(el);
   }
@@ -532,6 +702,8 @@ function renderDeck(){
       first=second=null; lock=false;
     }
   }
+  
+
 
 function buildShareText({ time, moves, pairs }) {
   return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
@@ -552,6 +724,8 @@ function buildShareText({ time, moves, pairs }) {
     const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
     const url  = currentPageLink();
     const shareData = { title: 'Match the Pack', text, url };
+	
+	let wintitles = getRandomSlogan();
 
     const btnNative = document.getElementById('shareNative');
     const btnCopy   = document.getElementById('shareCopy');
@@ -565,6 +739,10 @@ function buildShareText({ time, moves, pairs }) {
     aX.href  = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
     aFB.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
     aEmail.href = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') + '&body=' + encodeURIComponent(text + '\n\n' + url);
+	
+	  // 🆕 Pick a random slogan and display it
+  const winTitle = document.querySelector('#win .win-title');
+  if (winTitle) winTitle.textContent = wintitles;
 
     stopTimer();
     winDlg.showModal();
