@@ -560,6 +560,20 @@
     else { pairsSel.disabled = false; }
   }
 
+function openStatsOnMobile() {
+  if (window.matchMedia('(max-width: 640px)').matches) {
+    // Add .show-stats class to body if not already
+    if (!document.body.classList.contains('show-stats')) {
+      document.body.classList.add('show-stats');
+    }
+    // Smooth scroll into view
+    document.getElementById('statsPanel')?.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
+}
+
   const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
 
   async function newGame() {
@@ -595,6 +609,9 @@
 
     // Refresh leaderboard for this board size
     window.refreshLeaderboard?.(totalPairs);
+
+  // 🔥 NEW: auto-open stats panel on mobile after deck is rendered
+  openStatsOnMobile();
 
     await minLoad;
     hideLoading();
