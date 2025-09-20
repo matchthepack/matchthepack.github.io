@@ -221,6 +221,23 @@
   .link-control.mobile-only { display: none; }
 }
 
+/* --- Photo caption overlay --- */
+.face.front { position: relative; } /* keep front face positioned for absolute caption */
+.card .caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 6px 8px;
+  font-size: 12px; line-height: 1.25; font-weight: 600;
+  color: #fff;
+  /* readable over photos */
+  background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.35), rgba(0,0,0,0));
+  /* clamp to two lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  pointer-events: none;  /* avoids intercepting clicks */
+}
 
 </style>
 </head>
@@ -457,29 +474,46 @@ if (toggleStatsBtn) {
     return shuffle(doubled);
   }
 
-  function renderDeck(){
-    grid.innerHTML='';
-    for(const card of deck){
-      const el=document.createElement('button');
-      el.className='card focusable'; el.type='button';
-      el.setAttribute('data-id',card.id);
-      el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
+function renderDeck(){
+  grid.innerHTML='';
+  for(const card of deck){
+    const el=document.createElement('button');
+    el.className='card focusable'; el.type='button';
+    el.setAttribute('data-id',card.id);
 
-      const alt = (card.img.alt || '').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      const titleAttr = alt ? `title="${alt}"` : '';
+    const altRaw = card.img.alt || card.img.title || 'Hidden photo';
+    const altEsc = altRaw.replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const titleAttr = altEsc ? `title="${altEsc}"` : '';
 
-      el.innerHTML=`
-        <div class="inner">
-          <div class="face back"><img class="logo" src="${LOGO_URL}" alt="School logo" loading="lazy" decoding="async"></div>
-          <div class="face front">
-            <img ${titleAttr} alt="${alt}" src="${card.img.url}" loading="lazy" decoding="async" fetchpriority="low">
-          </div>
-        </div>`;
-      el.addEventListener('click',()=>flipCard(el,card), { passive:true });
-      el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
-      grid.appendChild(el);
-    }
+    // pick best caption source
+    const captionText = (card.img.caption && card.img.caption.trim())
+      || (card.img.title && card.img.title.trim())
+      || (card.img.alt && card.img.alt.trim())
+      || '';
+
+    el.setAttribute('aria-label', altRaw);
+
+    el.innerHTML = `
+      <div class="inner">
+        <!-- Back stays the same -->
+        <div class="face back">
+          <img class="logo" src="${LOGO_URL}" alt="School logo" loading="lazy" decoding="async">
+        </div>
+
+        <!-- Front: photo + caption bar -->
+        <div class="face front">
+          <img ${titleAttr} alt="${altEsc}" src="${card.img.url}" loading="lazy" decoding="async" fetchpriority="low">
+          ${captionText ? `<div class="caption">${captionText}</div>` : ``}
+        </div>
+      </div>
+    `;
+
+    el.addEventListener('click',()=>flipCard(el,card), { passive:true });
+    el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
+    grid.appendChild(el);
   }
+}
+
 
   async function flipCard(el, card){
     if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
