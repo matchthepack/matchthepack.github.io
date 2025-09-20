@@ -303,9 +303,31 @@ header{
   /* Title size on phones */
   .title{ font-size: clamp(18px, 5vw, 24px) }
 }
-
-
 </style>
+	<style>
+/* --- FINAL OVERRIDES --- */
+@media (max-width: 640px){
+  /* Force exactly 3 columns + comfy gap */
+  .grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px;
+    padding: 4px;
+  }
+
+  /* Hide pairs dropdown on mobile */
+  #pairsWrap { display: none !important; }
+
+  /* Hide desktop links */
+  .desktop-only { display: none !important; }
+
+  /* Make New Game button stand out on mobile */
+  #newGame {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
+}
+</style>
+
 </head>
 <body>
 <header>
