@@ -356,6 +356,20 @@
 <script>
   const LOGO_URL = 'logo.png'; // or absolute URL
 
+		const WIN_SLOGANS = [
+  "You Ran With the Wolves!",
+  "You Matched the Pack!",
+  "Alpha of the Pack!",
+  "Leader of the Pack!",
+  "Perfect Hunt! You Matched Them All!",
+  "You’re the Top Dog!",
+  "The Pack Cheers for You!"
+];
+
+function getRandomSlogan() {
+  return WIN_SLOGANS[Math.floor(Math.random() * WIN_SLOGANS.length)];
+}
+
   /* ===============================
      RS Wolves fetcher (via Cloudflare Worker proxy)
      =============================== */
@@ -373,20 +387,6 @@
       return new DOMParser().parseFromString(html, "text/html");
     }
     const textTrim = s => (s||"").replace(/\s+/g," ").trim();
-	
-	const WIN_SLOGANS = [
-  "You Ran With the Wolves!",
-  "You Matched the Pack!",
-  "Alpha of the Pack!",
-  "Leader of the Pack!",
-  "Perfect Hunt! You Matched Them All!",
-  "You’re the Top Dog!",
-  "The Pack Cheers for You!"
-];
-
-function getRandomSlogan() {
-  return WIN_SLOGANS[Math.floor(Math.random() * WIN_SLOGANS.length)];
-}
 
 
     function extractContext(imgEl){
