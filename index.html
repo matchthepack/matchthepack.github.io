@@ -373,6 +373,21 @@
       return new DOMParser().parseFromString(html, "text/html");
     }
     const textTrim = s => (s||"").replace(/\s+/g," ").trim();
+	
+	const WIN_SLOGANS = [
+  "You Ran With the Wolves!",
+  "You Matched the Pack!",
+  "Alpha of the Pack!",
+  "Leader of the Pack!",
+  "Perfect Hunt! You Matched Them All!",
+  "You’re the Top Dog!",
+  "The Pack Cheers for You!"
+];
+
+function getRandomSlogan() {
+  return WIN_SLOGANS[Math.floor(Math.random() * WIN_SLOGANS.length)];
+}
+
 
     function extractContext(imgEl){
       let node = imgEl;
@@ -461,6 +476,8 @@ if (toggleStatsBtn) {
 }
 
 
+
+
   function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
   function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
 
@@ -535,6 +552,8 @@ if (toggleStatsBtn) {
       first=second=null; lock=false;
     }
   }
+  
+
 
 function buildShareText({ time, moves, pairs }) {
   return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
@@ -555,6 +574,8 @@ function buildShareText({ time, moves, pairs }) {
     const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
     const url  = currentPageLink();
     const shareData = { title: 'Match the Pack', text, url };
+	
+	let wintitle = getRandomSlogan();
 
     const btnNative = document.getElementById('shareNative');
     const btnCopy   = document.getElementById('shareCopy');
@@ -568,6 +589,10 @@ function buildShareText({ time, moves, pairs }) {
     aX.href  = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
     aFB.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
     aEmail.href = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') + '&body=' + encodeURIComponent(text + '\n\n' + url);
+	
+	  // 🆕 Pick a random slogan and display it
+  const winTitle = document.querySelector('#win .win-title');
+  if (winTitle) winTitle.textContent = wintitle;
 
     stopTimer();
     winDlg.showModal();
