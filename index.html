@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a" />
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <title>Match the Pack — RS Wolves!</title>
 <style>
 /* 🎨 Red + White Theme */
@@ -505,21 +504,6 @@ input, select, textarea, button, label {
 </div>
 
 <script>
-<!-- Confetti + Game Logic -->
-// Create a dedicated confetti canvas with top-layer z-index
-const confettiCanvas = document.createElement('canvas');
-confettiCanvas.className = 'confetti-canvas';
-confettiCanvas.style.position = 'fixed';
-confettiCanvas.style.inset = '0';
-confettiCanvas.style.width = '100%';
-confettiCanvas.style.height = '100%';
-confettiCanvas.style.pointerEvents = 'none';
-confettiCanvas.style.zIndex = '2147483647'; // max safe z-index
-document.body.appendChild(confettiCanvas);
-
-// Bind confetti to this canvas
-const confettiInstance = confetti.create(confettiCanvas, { resize: true, useWorker: true });
-  
 function getOrCreateUsername() {
   const KEY = 'mtp_username';
   let name = localStorage.getItem(KEY);
@@ -868,6 +852,19 @@ newBtn.addEventListener('click', e => {
 
 <script>
 // Create a dedicated confetti canvas with top-layer z-index
+const confettiCanvas = document.createElement('canvas');
+confettiCanvas.className = 'confetti-canvas';
+confettiCanvas.style.position = 'fixed';
+confettiCanvas.style.inset = '0';
+confettiCanvas.style.width = '100%';
+confettiCanvas.style.height = '100%';
+confettiCanvas.style.pointerEvents = 'none';
+confettiCanvas.style.zIndex = '2147483647'; // max safe z-index
+document.body.appendChild(confettiCanvas);
+
+// Bind confetti to this canvas
+const confettiInstance = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+
 function launchStartCelebration() {
   // 1️⃣ Big emoji burst first
   confettiInstance({
