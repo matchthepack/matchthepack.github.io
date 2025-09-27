@@ -824,7 +824,7 @@ newBtn.addEventListener('click', e => {
   playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
 
   // DOM ready
-  window.addEventListener('DOMContentLoaded', () => { updatePairsForViewport(); newGame(); });
+  window.addEventListener('DOMContentLoaded', () => { launchStartCelebration();updatePairsForViewport(); newGame(); });
   window.addEventListener('resize', updatePairsForViewport);
 
   // Desktop links
