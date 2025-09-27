@@ -78,17 +78,26 @@ select, button, label {
   -webkit-tap-highlight-color: transparent;
 }
 button.primary {
-  background: var(--accent);
+  background-color: var(--accent); /* ✅ Keep the bright red fill */
+  background-image: url('wolfpaw-icon.svg'); /* your new icon */
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 20px 20px;
   color: #fff;
   font-weight: 700;
   text-transform: uppercase;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 40px; /* extra left padding for icon */
   font-size: 18px;
   border: none;
   border-radius: 6px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  transition: background-color .2s ease;
 }
-button.primary:hover { background: #b71c1c; }
+
+button.primary:hover {
+  background-color: #b71c1c; /* darker red on hover */
+}
+
 button.ghost { background: transparent; color: #fff; }
 
 /* Main Layout */
