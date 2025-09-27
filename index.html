@@ -1,1 +1,785 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7a0c0c" />
+<title>Match the Pack — RS Wolves!</title>
+<style>
+:root {
+  --bg: #7a0c0c;       /* Wolfpack Red Background */
+  --panel: #941919;    /* Slightly lighter red panels */
+  --card: #ffffff;     /* White cards */
+  --ink: #1a1a1a;      /* Dark text */
+  --muted: #e5e5e5;    /* Muted text for sublabels */
+  --accent: #d62828;   /* Bright red buttons / focus */
+  --accent-2: #2ecc71; /* Green for matched pairs */
+  --gold: #ffd479;     /* Gold for leaderboard */
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Header */
+header {
+  max-width: 1100px;
+  width: 92vw;
+  margin: 18px auto 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.title img {
+  height: 1em;
+  width: auto;
+}
+.slogan {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: -4px 0 4px 0;
+}
+.muted { color: var(--muted); }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+select, button, label {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+button.primary:hover { background: #b71c1c; }
+button.ghost { background: transparent; color: #fff; }
+
+/* Main Layout */
+main {
+  max-width: 1100px;
+  width: 92vw;
+  margin: 0 auto 30px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  main { grid-template-columns: 1fr; }
+}
+
+/* Panels & Stats */
+.panel {
+  background: #133c1f; /* dark green scoreboard look */
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stat {
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.stat .label { font-size: 12px; color: #ddd; }
+.stat .val { font-size: 20px; font-weight: 700; color: white; }
+
+/* Game Grid */
+.grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(min(28vw, 130px), 1fr));
+}
+.card {
+  position: relative;
+  height: 0;
+  padding-bottom: 100%;
+  perspective: 1000px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  border-radius: 12px;
+  transition: transform 0.45s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.card.matched .inner {
+  box-shadow: 0 0 0 3px var(--accent-2), inset 0 0 0 3px var(--accent-2);
+}
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.back { background: var(--accent); }
+.back .logo {
+  width: 50%; max-width: 110px;
+  height: auto;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+}
+.front { transform: rotateY(180deg); background: var(--card); }
+.card.flipped .inner { transform: rotateY(180deg); }
+
+.card-figure { position: relative; width: 100%; height: 100%; }
+.card-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-figure figcaption {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 4px 6px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.card.flipped figcaption,
+.card.matched figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer */
+footer {
+  margin: 10px auto;
+  width: 92vw;
+  max-width: 1100px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+/* Dialogs */
+dialog {
+  background: var(--panel);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  width: min(560px, 92vw);
+}
+dialog::backdrop { background: rgba(0,0,0,.6); }
+.win-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+/* Loading Overlay */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#loadingOverlay .loading-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+}
+
+/* Mobile tweaks */
+@media (max-width: 640px) {
+  main { grid-template-columns: 1fr !important; gap: 12px !important; }
+  aside.panel { display: none !important; }
+  body.show-stats aside.panel { display: block !important; }
+  .grid { grid-template-columns: repeat(3, 1fr) !important; gap: 12px; }
+  .title { font-size: clamp(20px, 6vw, 28px); }
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
+    <p class="slogan">Flip. Match. Howl Together! 🐺</p>
+    <p id="playerNameDisplay" class="muted">Welcome, <span id="playerName"></span>!</p>
+  </div>
+  <div class="controls">
+    <label id="pairsWrap" class="desktop-only">
+      Select Pairs:
+      <select id="pairs">
+        <option value="6">12 cards</option>
+        <option value="8" selected>16 cards</option>
+        <option value="10">20 cards</option>
+        <option value="12">24 cards</option>
+      </select>
+    </label>
+    <button id="newGame" class="primary">Play Now</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <aside class="panel">
+    <h3 style="margin:4px 0 10px">Dashboard</h3>
+    <div class="stats">
+      <div class="stat"><div class="label">Time</div><div id="time" class="val">00:00</div></div>
+      <div class="stat"><div class="label">Moves</div><div id="moves" class="val">0</div></div>
+      <div class="stat"><div class="label">Matches</div><div id="matches" class="val">0</div></div>
+      <div class="stat"><div class="label">Streak</div><div id="streak" class="val">0</div></div>
+    </div>
+    <div id="leaderboard" class="best">
+      <strong>Top Times</strong> <span id="lbPairs"></span>
+      <ol id="lbList"></ol>
+    </div>
+  </aside>
+
+  <section id="statsPanel" class="panel">
+    <div id="grid" class="grid" aria-label="Memory game grid"></div>
+  </section>
+</main>
+
+<footer>
+  <span>🐺 Built for the Wolf Pack · <a href="#" id="showHow" style="color:#fff">How to Play</a></span>
+  <a href="#" id="restartLink" style="color:#ffd479;display:none;">↻ Restart</a>
+</footer>
+
+<dialog id="win">
+  <p class="win-title">🏆 You ran with the Wolves!</p>
+  <div class="win-grid">
+    <div class="stat"><div class="label">Time</div><div id="winTime" class="val">—</div></div>
+    <div class="stat"><div class="label">Moves</div><div id="winMoves" class="val">—</div></div>
+    <div class="stat"><div class="label">Status</div><div id="winBest" class="val">—</div></div>
+  </div>
+  <div class="share-row">
+    <button id="shareNative" class="share btn">🔗 Share</button>
+    <button id="shareCopy" class="share btn ghost" style="display:none">📋 Copy link</button>
+    <a id="shareX" class="share btn ghost" target="_blank" rel="noopener">𝕏 Post</a>
+    <a id="shareFB" class="share btn ghost" target="_blank" rel="noopener">Facebook</a>
+    <a id="shareEmail" class="share btn ghost">Email</a>
+  </div>
+  <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px">
+    <form method="dialog"><button class="ghost">Close</button></form>
+    <button id="playAgain" class="primary">Play Again</button>
+  </div>
+</dialog>
+
+<dialog id="how">
+  <p class="win-title">How to Play</p>
+  <div class="muted" style="line-height:1.6">
+    Flip two cards. If the photos match, they stay face-up. If not, they flip back.
+    Clear the board with the fewest moves in the fastest time!
+  </div>
+  <form method="dialog" style="margin-top:12px"><button class="primary">Got it</button></form>
+</dialog>
+
+<div id="loadingOverlay">
+  <img src="logo.png" alt="RS Wolves Logo" class="loading-logo">
+  <span>...Loading the Pack!</span>
+</div>
+
+<script>
+function getOrCreateUsername() {
+  const KEY = 'mtp_username';
+  let name = localStorage.getItem(KEY);
+  if (!name) {
+    const adjectives = [
+  "Swift", "Mighty", "Clever", "Brave", "Silent", "Wild", "Lone", "Sneaky", "Fierce", "Lucky",
+  "Proud", "Loyal", "Bold", "Fearless", "Noble", "Rowdy", "True", "Relentless", "United", "Spirited",
+  "Gritty", "Savage", "Strong", "Howling", "Tenacious", "Lively", "Alpha", "Alpha-Strong", "Daring", "Epic"
+];
+
+const nouns = [
+  "Wolf", "Howler", "Runner", "Shadow", "Hunter", "Alpha", "Cub", "Chaser", "Guardian", "Pup",
+  "Leader", "Packmate", "Striker", "Scout", "Fang", "Claw", "Trailblazer", "Howl", "Defender", "Spirit",
+  "Champion", "Ranger", "Tracker", "Storm", "Luna", "Echo", "Prowler", "Sentry", "Blaze", "Roamer"
+];
+
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    const num = Math.floor(Math.random() * 999); // adds uniqueness
+    name = `${adj}${noun}${num}`; // e.g. "SwiftWolf842"
+    localStorage.setItem(KEY, name);
+  }
+  return name;
+}
+
+// Call once at page load:
+const playerName = getOrCreateUsername();
+console.log("Welcome back,", playerName);
+document.getElementById("playerName").textContent = playerName;
+
+
+  const LOGO_URL = 'logo.png';
+
+  const WIN_SLOGANS = [
+    "You Ran With the Wolves!",
+    "You Matched the Pack!",
+    "Alpha of the Pack!",
+    "Leader of the Pack!",
+    "Perfect Hunt! You Matched Them All!",
+    "You’re the Top Dog!",
+    "The Pack Cheers for You!"
+  ];
+  function getRandomSlogan(){ return WIN_SLOGANS[Math.floor(Math.random()*WIN_SLOGANS.length)] }
+
+  /* ========== Apptegy fetcher via CF Worker ========== */
+  async function fetchApptegyImages({ roots=["/live-feed"], pages=2, limit=50 } = {}){
+    const ORIGIN = "https://www.rs-wolves.com";
+    const IMG_CDNS = ["core-docs.s3.amazonaws.com","cmsv2-assets.apptegy.net"];
+    const isCdn = src => IMG_CDNS.some(h => src.includes(h));
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const PROXY = "https://rswolves-proxy.ckonkol.workers.dev/?url=";
+
+    async function getDOM(url){
+      const res = await fetch(PROXY + encodeURIComponent(url), { mode:"cors" });
+      if(!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
+      const html = await res.text();
+      return new DOMParser().parseFromString(html, "text/html");
+    }
+    const textTrim = s => (s||"").replace(/\s+/g," ").trim();
+
+    function extractContext(imgEl){
+      let node = imgEl;
+      for(let i=0;i<8 && node && node!==document;i++){
+        if(node.matches?.("article, .post, .feed-item, .live-feed-item, li, section")) break;
+        node = node.parentElement;
+      }
+      const c = node || imgEl.closest("figure") || imgEl.parentElement;
+      const caption = c?.querySelector?.("figcaption")?.textContent || "";
+      const timeEl = c?.querySelector?.("time[datetime]") || c?.querySelector?.("time");
+      const dateISO = timeEl?.getAttribute?.("datetime") || "";
+      const dateText = timeEl?.textContent || "";
+      let postText="";
+      if(c){
+        const clone=c.cloneNode(true);
+        clone.querySelectorAll("figcaption, nav, button, a[aria-label='Read more'], img").forEach(n=>n.remove());
+        postText = textTrim(clone.textContent||"");
+      }
+      return { caption:textTrim(caption), description:postText, date: dateISO || textTrim(dateText) };
+    }
+    const guessMime = u => { const m=(u||"").toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)(?:\?|#|$)/); return m ? `image/${m[1]==="jpg"?"jpeg":m[1]}` : "image/*" };
+
+    const results=[]; const seen=new Set();
+    for(const root of roots){
+      for(let p=1;p<=pages;p++){
+        const url = `${ORIGIN}${root}${p>1?`?page=${p}`:""}`;
+        try{
+          const dom = await getDOM(url);
+          const imgs = [...dom.querySelectorAll('img[src], source[srcset] ~ img, picture img')];
+          for(const img of imgs){
+            const src = img.currentSrc || img.src || "";
+            if(!src || !isCdn(src) || /\.(svg|mp4|webm|pdf)(?:\?|#|$)/i.test(src)) continue;
+            const { caption, description, date } = extractContext(img);
+            const alt = img.getAttribute("alt") || "";
+            const title = img.getAttribute("title") || alt || "";
+            const media = { url:src, title, alt, caption, description, mime:guessMime(src), date, width:null, height:null, page_url:url };
+            if(!seen.has(media.url)){ seen.add(media.url); results.push(media); if(results.length>=limit) return results; }
+          }
+          await sleep(200);
+        }catch(e){ console.warn("Page fetch error:", e); }
+      }
+    }
+    return results;
+  }
+
+  /* ========== Placeholders ========== */
+  function getPlaceholderImages(n){
+    const seed = Date.now().toString(36);
+    return Array.from({length:n}, (_,i)=> ({
+      url: `https://picsum.photos/seed/${seed}-${i}/400/400`,
+      alt: `Placeholder #${i+1}`,
+      title: `Photo ${i+1}`,
+      caption: '', description: '', mime: 'image/jpeg', date: ''
+    }));
+  }
+
+  /* ========== Game Logic ========== */
+  const $ = s => document.querySelector(s);
+  const grid = $('#grid');
+  const timeEl = $('#time'), movesEl = $('#moves'), matchesEl = $('#matches'), streakEl = $('#streak');
+  const pairsSel = $('#pairs'), newBtn = $('#newGame'), restartLink = $('#restartLink');
+  const winDlg = $('#win'), howDlg = $('#how'), showHowBtn = $('#showHow'), playAgainBtn = $('#playAgain');
+  const useRS = $('#useRS');
+
+  const toggleStatsBtn = document.getElementById('toggleStats');
+  toggleStatsBtn?.addEventListener('click', () => {
+    const on = document.body.classList.toggle('show-stats');
+    toggleStatsBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  function showLoading(){ const o=$('#loadingOverlay'); if(!o) return; newBtn.disabled=true; o.style.opacity=1; o.style.pointerEvents="auto"; }
+  function hideLoading(){ const o=$('#loadingOverlay'); if(!o) return; o.style.opacity=0; o.style.pointerEvents="none"; newBtn.disabled=false; }
+
+  let timer=null, seconds=0, moves=0, matches=0, streak=0;
+  let lock=false, first=null, second=null, deck=[];
+  let totalPairs = parseInt(pairsSel.value,10);
+
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+  function fmtTime(s){ const m=String(Math.floor(s/60)).padStart(2,'0'); const sec=String(s%60).padStart(2,'0'); return `${m}:${sec}` }
+  window.fmtTime = fmtTime; // expose for module
+  function startTimer(){ stopTimer(); timer=setInterval(()=>{ seconds++; timeEl.textContent=fmtTime(seconds) },1000) }
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
+  function resetStats(){ seconds=0;moves=0;matches=0;streak=0; timeEl.textContent='00:00'; movesEl.textContent='0'; matchesEl.textContent='0'; streakEl.textContent='0' }
+
+  function setGridColumns(pairCount){
+    if (window.innerWidth <= 640) return;
+    const map={6:'repeat(4,1fr)',8:'repeat(4,1fr)',10:'repeat(5,1fr)',12:'repeat(6,1fr)'};
+    grid.style.gridTemplateColumns = map[pairCount] || 'repeat(4,1fr)';
+  }
+  window.addEventListener('resize', ()=> setGridColumns(parseInt(pairsSel.value,10)));
+
+  function buildDeck(images, pairCount){
+    const uniq = images.slice(0, pairCount);
+    const doubled = uniq.flatMap((img,idx)=>[
+      { id:`${idx}-A`, pair:idx, img },
+      { id:`${idx}-B`, pair:idx, img }
+    ]);
+    return shuffle(doubled);
+  }
+
+  function escapeHtml(str){
+    return (str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderDeck(){
+    grid.innerHTML='';
+    for(const card of deck){
+      const el=document.createElement('button');
+      el.className='card focusable';
+      el.type='button';
+      el.setAttribute('data-id',card.id);
+      el.setAttribute('aria-label',card.img.alt || card.img.title || 'Hidden photo');
+
+      const captionText = escapeHtml(card.img.title || card.img.alt || '');
+      el.innerHTML=`
+        <div class="inner">
+          <div class="face back">
+            <img class="logo" src="${LOGO_URL}" alt="School logo">
+          </div>
+          <div class="face front">
+            <figure class="card-figure">
+              <img src="${card.img.url}" alt="${captionText}">
+              <figcaption>${captionText}</figcaption>
+            </figure>
+          </div>
+        </div>`;
+      el.addEventListener('click',()=>flipCard(el,card));
+      el.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); flipCard(el,card) } });
+      grid.appendChild(el);
+    }
+  }
+
+  async function flipCard(el, card){
+    if(lock || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+    if(moves===0 && seconds===0 && !timer) startTimer();
+    el.classList.add('flipped');
+    if(!first){ first={el,card}; return }
+    second={el,card}; lock=true; moves++; movesEl.textContent=moves;
+
+    if(first.card.pair===second.card.pair){
+      matches++; matchesEl.textContent=matches; streak++; streakEl.textContent=streak;
+      first.el.classList.add('matched'); second.el.classList.add('matched');
+      first=second=null; lock=false; if(matches===totalPairs) setTimeout(announceWin,350);
+    } else {
+      streak=0; streakEl.textContent='0'; await new Promise(r=>setTimeout(r,500));
+      first.el.classList.remove('flipped'); second.el.classList.remove('flipped');
+      first=second=null; lock=false;
+    }
+  }
+
+  function buildShareText({ time, moves, pairs }) {
+    return `I just finished “Match the Pack” in ${time} with ${moves} moves on a ${pairs * 2}-card board! 🐺`;
+  }
+  function currentPageLink(){ return location.href.split('#')[0]; }
+  async function copyToClipboard(text){ try{ await navigator.clipboard.writeText(text); alert('Link copied!') } catch{ prompt('Copy this link:', text) } }
+
+  // Simple anonymous device id
+  const USER_ID = localStorage.getItem('mtpack_uid') || (() => {
+    const id = (crypto?.randomUUID?.() || (Date.now() + '-' + Math.random().toString(36).slice(2)));
+    localStorage.setItem('mtpack_uid', id);
+    return id;
+  })();
+
+  function announceWin(){
+    const pairs = totalPairs;
+    const text = buildShareText({ time: fmtTime(seconds), moves, pairs });
+    const url  = currentPageLink();
+    const shareData = { title: 'Match the Pack', text, url };
+
+    const btnNative = document.getElementById('shareNative');
+    const btnCopy   = document.getElementById('shareCopy');
+    const aX        = document.getElementById('shareX');
+    const aFB       = document.getElementById('shareFB');
+    const aEmail    = document.getElementById('shareEmail');
+
+    document.querySelector('#win .win-title').textContent = getRandomSlogan();
+    $('#winTime').textContent = fmtTime(seconds);
+    $('#winMoves').textContent = moves;
+    $('#winBest').textContent = 'Submitting...';
+
+    if (navigator.share) { btnNative.disabled=false; btnNative.onclick=()=>navigator.share(shareData).catch(()=>{}); }
+    else { btnNative.disabled=true; }
+    btnCopy.onclick = () => copyToClipboard(url);
+    aX.href  = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text + ' ') + encodeURIComponent(url);
+    aFB.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    aEmail.href = 'mailto:?subject=' + encodeURIComponent('Match the Pack — I beat the board!') + '&body=' + encodeURIComponent(text + '\n\n' + url);
+
+    // 🔥 Save score in Firebase & refresh leaderboard
+    window.saveScoreToFirebase?.({ userId: USER_ID, timeSec: seconds, moves, pairs: totalPairs })
+      .then(()=> { $('#winBest').textContent = 'Saved!'; })
+      .catch(()=> { $('#winBest').textContent = 'Saved locally'; })
+      .finally(()=> { window.refreshLeaderboard?.(totalPairs); });
+
+    stopTimer();
+    winDlg.showModal();
+  }
+
+  function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+  function updatePairsForViewport(){
+    if (!pairsSel) return;
+    const mobile = isMobile();
+    if (mobile) { if (parseInt(pairsSel.value, 10) > 6) pairsSel.value = '6'; pairsSel.disabled = true; }
+    else { pairsSel.disabled = false; }
+  }
+
+  const RS_ROOTS = [ "/live-feed", "/o/hs/live-feed", "/o/ms/live-feed", "/o/ps/live-feed", "/o/es/live-feed", "/o/gtc/live-feed" ];
+
+  async function newGame() {
+    showLoading();
+    const minLoad = new Promise(r => setTimeout(r, 3000));
+
+    updatePairsForViewport();
+    stopTimer(); resetStats(); winDlg.close();
+    totalPairs = parseInt(pairsSel.value, 10);
+    setGridColumns(totalPairs);
+
+    let images = [];
+    const shouldUseRS = useRS ? useRS.checked : false;
+    if (shouldUseRS) {
+      try {
+        const rsImgs = await fetchApptegyImages({ roots: RS_ROOTS, pages: 3, limit: 80 });
+        images = rsImgs.filter(x => x && x.url);
+        if (images.length < totalPairs) {
+          const more = await fetchApptegyImages({ roots: ["/live-feed"], pages: 6, limit: 80 });
+          images = images.concat(more);
+        }
+        images = shuffle(images).slice(0, totalPairs);
+      } catch (err) {
+        console.warn('Apptegy fetch failed; using placeholders:', err);
+        images = getPlaceholderImages(totalPairs);
+      }
+    } else {
+      images = getPlaceholderImages(totalPairs);
+    }
+
+    deck = buildDeck(images, totalPairs);
+    renderDeck();
+
+    // Refresh leaderboard for this board size
+    window.refreshLeaderboard?.(totalPairs);
+
+    await minLoad;
+    hideLoading();
+  }
+
+newBtn.addEventListener('click', e => {
+  e.preventDefault();
+  if (confirm("Are you ready to Match the Pack?")) {
+    location.reload();
+  }
+});
+  restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
+  pairsSel.addEventListener('change', newGame);
+  showHowBtn.addEventListener('click', ()=> howDlg.showModal());
+  playAgainBtn.addEventListener('click', ()=>{ winDlg.close(); newGame() });
+
+  // DOM ready
+  window.addEventListener('DOMContentLoaded', () => { updatePairsForViewport(); newGame(); });
+  window.addEventListener('resize', updatePairsForViewport);
+
+  // Desktop links
+  document.getElementById('showHow')?.addEventListener('click', e => { e.preventDefault(); howDlg.showModal(); });
+  document.getElementById('toggleStats')?.addEventListener('click', e => {
+    e.preventDefault();
+    const on = document.body.classList.toggle('show-stats');
+    e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Mobile links
+  document.getElementById('showHowMobile')?.addEventListener('click', e => { e.preventDefault(); howDlg.showModal(); });
+  document.getElementById('toggleStatsMobile')?.addEventListener('click', e => {
+    e.preventDefault();
+    const on = document.body.classList.toggle('show-stats');
+    e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>
+
+<!-- 🔥 Firebase Leaderboard (Firestore) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, orderBy, limit, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+/* 1) Replace with your Firebase project settings */
+const firebaseConfig = {
+  apiKey: "AIzaSyCHlFxGqnTQx9wmOqgMb7ZZuFwNFWkzXmA",
+  authDomain: "matchthepack.firebaseapp.com",
+  projectId: "matchthepack",
+  storageBucket: "matchthepack.firebasestorage.app",
+  messagingSenderId: "21156338314",
+  appId: "1:21156338314:web:22db281e81969b55fa2b73"
+};
+
+/* 2) Init Firestore */
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* 3) Save a score */
+async function saveScoreToFirebase({ userId, timeSec, moves, pairs }) {
+  try {
+    await addDoc(collection(db, "scores"), {
+        username: playerName,
+  timeSec: seconds,
+  moves,
+  pairs: totalPairs,
+  createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("Score save failed:", e);
+    throw e;
+  }
+}
+
+/* 4) Load top scores per board size */
+async function refreshLeaderboard(pairs) {
+  try {
+    const listEl = document.getElementById('lbList');
+    const pairsEl = document.getElementById('lbPairs');
+    if (!listEl) return;
+
+    pairsEl.textContent = `(${pairs*2} cards)`;
+
+    const q = query(
+      collection(db, "scores"),
+      where("pairs", "==", pairs),
+      orderBy("timeSec", "asc"),
+      orderBy("moves", "asc"),
+      limit(10)
+    );
+
+    const snap = await getDocs(q);
+    const rows = [];
+    let rank = 1;
+    snap.forEach(doc => {
+      const d = doc.data();
+      const timeText = (window.fmtTime ? window.fmtTime(d.timeSec) : d.timeSec + 's');
+      rows.push(`<li>${d.username}, ${timeText} — ${d.moves} moves</li>`);
+    });
+
+    listEl.innerHTML = rows.length ? rows.join("") : `<li>No scores yet — be first!</li>`;
+  } catch (e) {
+    console.warn("Leaderboard load failed:", e);
+  }
+}
+
+/* 5) Expose to window so non-module script can call */
+window.saveScoreToFirebase = saveScoreToFirebase;
+window.refreshLeaderboard  = refreshLeaderboard;
+</script>
+<script>
+// Prevent pinch zoom
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+// Prevent double-tap zoom (iOS Safari edge case)
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouch <= 350) {
+    e.preventDefault(); // block double-tap zoom
+  }
+  lastTouch = now;
+}, { passive: false });
+
+// Prevent ctrl+wheel zoom
+document.addEventListener('wheel', e => {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+</script>
+
+</body>
+</html>
