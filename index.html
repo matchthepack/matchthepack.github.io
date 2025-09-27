@@ -503,6 +503,20 @@ input, select, textarea, button, label {
 </div>
 
 <script>
+// Create a dedicated confetti canvas with top-layer z-index
+const confettiCanvas = document.createElement('canvas');
+confettiCanvas.className = 'confetti-canvas';
+confettiCanvas.style.position = 'fixed';
+confettiCanvas.style.inset = '0';
+confettiCanvas.style.width = '100%';
+confettiCanvas.style.height = '100%';
+confettiCanvas.style.pointerEvents = 'none';
+confettiCanvas.style.zIndex = '2147483647'; // max safe z-index
+document.body.appendChild(confettiCanvas);
+
+// Bind confetti to this canvas
+const confettiInstance = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+  
 function getOrCreateUsername() {
   const KEY = 'mtp_username';
   let name = localStorage.getItem(KEY);
@@ -850,9 +864,11 @@ newBtn.addEventListener('click', e => {
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <script>
+
+
 function launchStartCelebration() {
   // 1️⃣ Big emoji burst first
-  confetti({
+  confettiInstance({
     particleCount: 30,
     emojis: ['🐺', '🏈', '🎾', '🏐'],
     scalar: 1.5,
@@ -879,12 +895,12 @@ function launchStartCelebration() {
     }
 
     const particleCount = 20 * (timeLeft / duration);
-    confetti(Object.assign({}, defaults, {
+    confettiInstance(Object.assign({}, defaults, {
       particleCount,
       angle: 60,
       origin: { x: 0 }
     }));
-    confetti(Object.assign({}, defaults, {
+    confettiInstance(Object.assign({}, defaults, {
       particleCount,
       angle: 120,
       origin: { x: 1 }
@@ -903,8 +919,8 @@ function launchConfetti() {
     const timeLeft = animationEnd - Date.now();
     if (timeLeft <= 0) return clearInterval(interval);
     const particleCount = 40 * (timeLeft / duration);
-    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }});
-    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }});
+    confettiInstance({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }});
+    confettiInstance({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }});
   }, 200);
 }
 
