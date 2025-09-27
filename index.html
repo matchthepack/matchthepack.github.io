@@ -365,6 +365,128 @@ dialog#win .share.btn.ghost {
   <span>Loading the Pack...</span>
 </div>
 
-<!-- Your existing JS + Firebase code goes here (unchanged) -->
+<!-- Confetti + Zoom Prevention -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script>
+function launchConfetti() {
+  const duration = 2000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+  function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+  const interval = setInterval(() => {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) return clearInterval(interval);
+    const particleCount = 40 * (timeLeft / duration);
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }});
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }});
+  }, 200);
+}
+
+// Hook Play Again button
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("playAgain")?.addEventListener("click", launchConfetti);
+});
+
+// Call confetti on win (hook into existing game logic)
+const originalAnnounceWin = window.announceWin;
+window.announceWin = function() {
+  launchConfetti();
+  if (originalAnnounceWin) originalAnnounceWin();
+};
+
+// Prevent pinch zoom
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+// Prevent double-tap zoom
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouch <= 350) e.preventDefault();
+  lastTouch = now;
+}, { passive: false });
+
+// Prevent ctrl+wheel zoom (desktop)
+document.addEventListener('wheel', e => {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+</script>
+
+<!-- Your existing JS & Firebase code goes here -->
+<!-- 🔥 Firebase Leaderboard (Firestore) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, orderBy, limit, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+/* 1) Replace with your Firebase project settings */
+const firebaseConfig = {
+  apiKey: "AIzaSyCHlFxGqnTQx9wmOqgMb7ZZuFwNFWkzXmA",
+  authDomain: "matchthepack.firebaseapp.com",
+  projectId: "matchthepack",
+  storageBucket: "matchthepack.firebasestorage.app",
+  messagingSenderId: "21156338314",
+  appId: "1:21156338314:web:22db281e81969b55fa2b73"
+};
+
+/* 2) Init Firestore */
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* 3) Save a score */
+async function saveScoreToFirebase({ userId, timeSec, moves, pairs }) {
+  try {
+    await addDoc(collection(db, "scores"), {
+        username: playerName,
+  timeSec: seconds,
+  moves,
+  pairs: totalPairs,
+  createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("Score save failed:", e);
+    throw e;
+  }
+}
+
+/* 4) Load top scores per board size */
+async function refreshLeaderboard(pairs) {
+  try {
+    const listEl = document.getElementById('lbList');
+    const pairsEl = document.getElementById('lbPairs');
+    if (!listEl) return;
+
+    pairsEl.textContent = `(${pairs*2} cards)`;
+
+    const q = query(
+      collection(db, "scores"),
+      where("pairs", "==", pairs),
+      orderBy("timeSec", "asc"),
+      orderBy("moves", "asc"),
+      limit(10)
+    );
+
+    const snap = await getDocs(q);
+    const rows = [];
+    let rank = 1;
+    snap.forEach(doc => {
+      const d = doc.data();
+      const timeText = (window.fmtTime ? window.fmtTime(d.timeSec) : d.timeSec + 's');
+      rows.push(`<li>${d.username}, ${timeText} — ${d.moves} moves</li>`);
+    });
+
+    listEl.innerHTML = rows.length ? rows.join("") : `<li>No scores yet — be first!</li>`;
+  } catch (e) {
+    console.warn("Leaderboard load failed:", e);
+  }
+}
+
+/* 5) Expose to window so non-module script can call */
+window.saveScoreToFirebase = saveScoreToFirebase;
+window.refreshLeaderboard  = refreshLeaderboard;
+</script>
 </body>
 </html>
