@@ -848,7 +848,7 @@ newBtn.addEventListener('click', e => {
 function launchConfetti() {
   const duration = 2000;
   const animationEnd = Date.now() + duration;
-  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999  };
   function randomInRange(min, max) { return Math.random() * (max - min) + min; }
   const interval = setInterval(() => {
     const timeLeft = animationEnd - Date.now();
