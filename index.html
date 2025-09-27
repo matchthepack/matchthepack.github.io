@@ -811,12 +811,12 @@ document.getElementById("playerName").textContent = playerName;
 
 newBtn.addEventListener('click', e => {
   e.preventDefault();
-  if (confirm("Are you ready to Match the Pack?")) {
+ // if (confirm("Are you ready to Match the Pack?")) {
     launchStartCelebration();  // 🎉 celebration first
     setTimeout(() => {
       location.reload();
     }, 800); // small delay so user sees confetti before reload
-  }
+  //}
 });
 
   restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
