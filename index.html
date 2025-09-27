@@ -811,9 +811,13 @@ document.getElementById("playerName").textContent = playerName;
 newBtn.addEventListener('click', e => {
   e.preventDefault();
   if (confirm("Are you ready to Match the Pack?")) {
-    location.reload();
+    launchStartCelebration();  // 🎉 celebration first
+    setTimeout(() => {
+      location.reload();
+    }, 800); // small delay so user sees confetti before reload
   }
 });
+
   restartLink.addEventListener('click', e=>{ e.preventDefault(); newGame() });
   pairsSel.addEventListener('change', newGame);
   showHowBtn.addEventListener('click', ()=> howDlg.showModal());
@@ -844,7 +848,30 @@ newBtn.addEventListener('click', e => {
 
 <!-- Confetti + Game Logic -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
 <script>
+function launchStartCelebration() {
+  // Just fire one strong burst of emojis
+  confetti({
+    particleCount: 40,
+    emojis: ['🐺', '🏈', '🎾', '🏐'], // wolf + football + tennis + volleyball
+    scalar: 1.5,
+    zIndex: 99999
+  });
+
+  // Optional: a second burst after a short delay for extra flair
+  setTimeout(() => {
+    confetti({
+      particleCount: 30,
+      emojis: ['🐺', '🏈', '🎾', '🏐'],
+      scalar: 1.5,
+      zIndex: 99999
+    });
+  }, 300);
+}
+
+
+
 function launchConfetti() {
   const duration = 2000;
   const animationEnd = Date.now() + duration;
