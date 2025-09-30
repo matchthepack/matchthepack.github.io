@@ -463,8 +463,8 @@ input, select, textarea, button, label {
   <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
     <a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none;display:none;">↻ Restart</a>
     <span class="mobile-links mobile-only">
-      · <a href="#" id="toggleStatsMobile" class="link-control" style="color: white;">📊 Stats</a>
-      · <a href="#" id="showHowMobile" class="link-control" style="color: white;">❔ How to Play</a>
+      <a href="#" id="toggleStatsMobile" class="link-control" style="color: white;">📊 Stats</a>&nbsp;&nbsp;       
+      <a href="#" id="showHowMobile" class="link-control" style="color: white;">❔ How to Play</a>
     </span>
   </div>
 </footer>
@@ -843,7 +843,12 @@ newBtn.addEventListener('click', e => {
     e.preventDefault();
     const on = document.body.classList.toggle('show-stats');
     e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
-    if (on) $('html, body').animate({ scrollTop: 0 }, 'fast');
+    if (on) {
+      //toggleStatsMobile
+       document.getElementById('toggleStatsMobile').style.display = 'none';
+      document.getElementById('statsPanel').style.display = 'none';
+      $('html, body').animate({ scrollTop: 0 }, 'fast');
+    }
   });
 </script>
 
