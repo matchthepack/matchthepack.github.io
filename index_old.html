@@ -84,7 +84,7 @@
   main{
     max-width:1100px;
     width:92vw;
-    margin:0 auto 10px;
+    margin:0 auto 30px;
     display:grid;
     grid-template-columns: 280px 1fr;
     gap:18px
@@ -439,7 +439,7 @@ input, select, textarea, button, label {
 <main>
   <aside class="panel">
     <h3 style="margin:6px 4px 10px">Dashboard</h3>
-    <div id="stats" class="stats">
+    <div class="stats">
       <div class="stat"><div class="label">Time</div><div id="time" class="val">00:00</div></div>
       <div class="stat"><div class="label">Moves</div><div id="moves" class="val">0</div></div>
       <div class="stat"><div class="label">Matches</div><div id="matches" class="val">0</div></div>
@@ -463,8 +463,8 @@ input, select, textarea, button, label {
   <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
     <a href="#" id="restartLink" style="color:#93c5fd;text-decoration:none;display:none;">↻ Restart</a>
     <span class="mobile-links mobile-only">
-      <a href="#" id="toggleStatsMobile" class="link-control" style="color: white;">📊 Stats</a>&nbsp;&nbsp;       
-      <a href="#" id="showHowMobile" class="link-control" style="color: white;">❔ How to Play</a>
+      · <a href="#" id="toggleStatsMobile" class="link-control" style="color: white;">📊 Stats</a>
+      · <a href="#" id="showHowMobile" class="link-control" style="color: white;">❔ How to Play</a>
     </span>
   </div>
 </footer>
@@ -843,13 +843,7 @@ newBtn.addEventListener('click', e => {
     e.preventDefault();
     const on = document.body.classList.toggle('show-stats');
     e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
-    if (on) {
-      //toggleStatsMobile
-       document.getElementById('stats').style.display = 'none';
-       document.getElementById('toggleStatsMobile').style.display = 'none';
-      document.getElementById('statsPanel').style.display = 'none';
-      $('html, body').animate({ scrollTop: 0 }, 'fast');
-    }
+    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
   });
 </script>
 
