@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a" />
 <title>Match the Pack — RS Wolves!</title>
 <style>
@@ -405,9 +405,128 @@ input, select, textarea, button, label {
   pointer-events: none !important;
 }
 
+/* 1) Sensible reset */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+
+/* 2) Viewport-safe sizing */
+:root {
+  /* Use small/large dynamic viewport units to behave well with mobile browser chrome */
+  --vw: 100vw;
+  --vh: 100svh; /* on iOS/Android this avoids the URL bar jump */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* 3) App layout: header (auto) + main (fills) + footer (auto) */
+.app {
+  min-height: var(--vh);
+  padding: max(8px, 2vmin);
+  padding-top: calc(max(8px, 2vmin) + var(--safe-top));
+  padding-right: calc(max(8px, 2vmin) + var(--safe-right));
+  padding-bottom: calc(max(8px, 2vmin) + var(--safe-bottom));
+  padding-left: calc(max(8px, 2vmin) + var(--safe-left));
+
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  overflow: hidden; /* no accidental scroll */
+}
+
+/* 4) Center the main content */
+.app > main {
+  display: grid;
+  place-items: center;
+  min-height: 0; /* allow child to shrink if needed */
+}
+
+/* 5) Perfectly square, always fits screen */
+.board {
+  /* Pick the smaller of width/height after padding so it always fits */
+  width: min(92vw, calc(var(--vh) - 160px));
+  /* If you have a tall header/footer, adjust the 160px buffer (header+footer approx) */
+  max-width: 100%;
+  aspect-ratio: 1 / 1; /* stay square */
+  display: grid;
+  gap: clamp(4px, 1vmin, 10px);
+
+  /* Responsive card grid:
+     - 12 cards: bigger cells
+     - 24 cards: more columns automatically
+  */
+  grid-template-columns: repeat(auto-fit, minmax(clamp(64px, 16vmin, 140px), 1fr));
+  align-content: center;
+  justify-items: center;
+}
+
+/* 6) Cards scale with the grid */
+.card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 7) Typography scales but stays readable */
+:root {
+  --base: clamp(14px, 2.2vmin, 18px);
+  --h: clamp(18px, 3.4vmin, 28px);
+}
+body { font-size: var(--base); line-height: 1.3; }
+h1, .title { font-size: var(--h); margin: 0.2em 0; }
+
+/* 8) Buttons and controls wrap/fit on small screens */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+button, .btn {
+  font: inherit;
+  padding: 0.55em 0.9em;
+  min-height: 40px; /* prevents iOS zoom */
+  touch-action: manipulation;
+}
+
+/* 9) Prevent layout shifts on mobile when keyboard shows */
+@supports (height: 100dvh) {
+  :root { --vh: 100dvh; } /* Use dvh in installed PWAs for rock-solid fit */
+}
+
+/* 10) If you show modal dialogs, keep them inside the viewport */
+.modal {
+  position: fixed;
+  inset: 0;
+  padding: 16px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, black 50%, transparent);
+}
+.modal__content {
+  width: min(92vw, 700px);
+  max-height: min(calc(var(--vh) - 64px), 90vh);
+  overflow: auto;
+  border-radius: 12px;
+}
+
+
 </style>
 </head>
 <body>
+   <div class="app">
 <header>
   <div class="title"><img src="logo.png" alt="RS Wolves Logo">Match the Pack</div>
   <p class="slogan">Flip. Match.<br>Howl Together!🐺💪</p>
@@ -437,6 +556,7 @@ input, select, textarea, button, label {
 </header>
 
 <main>
+    <section class="board">
   <aside class="panel">
     <h3 style="margin:6px 4px 10px">Dashboard</h3>
     <div class="stats">
@@ -455,6 +575,7 @@ input, select, textarea, button, label {
 
   <section id="statsPanel" class="panel">
     <div id="grid" class="grid" aria-label="Memory game grid"></div>
+  </section>
   </section>
 </main>
 
@@ -1031,5 +1152,6 @@ document.addEventListener('wheel', e => {
   if (e.ctrlKey) e.preventDefault();
 }, { passive: false });
 </script>
+</div>
 </body>
 </html>
