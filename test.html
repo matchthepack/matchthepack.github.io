@@ -431,6 +431,16 @@ main, .board-wrapper {
   width: min(95vw, 95svh);      /* fit to smallest dimension */
 }
 
+/* Force <main> to grow and center the board */
+main {
+  flex: 1;                  /* let it stretch vertically */
+  display: flex !important; /* override grid layout */
+  flex-direction: column;
+  justify-content: center;  /* vertical center */
+  align-items: center;      /* horizontal center */
+  margin-bottom: 0 !important;
+}
+
 
 </style>
 </head>
