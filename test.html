@@ -843,7 +843,7 @@ newBtn.addEventListener('click', e => {
     e.preventDefault();
     const on = document.body.classList.toggle('show-stats');
     e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
-    if (on) document.getElementById('statsPanel')?.scrollIntoView({ behavior: 'smooth' });
+    if (on) $('html, body').animate({ scrollTop: 0 }, 'fast');
   });
 </script>
 
