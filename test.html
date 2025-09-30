@@ -84,7 +84,7 @@
   main{
     max-width:1100px;
     width:92vw;
-    margin:0 auto 30px;
+    margin:0 auto 10px;
     display:grid;
     grid-template-columns: 280px 1fr;
     gap:18px
@@ -404,43 +404,6 @@ input, select, textarea, button, label {
 .confetti-canvas {
   pointer-events: none !important;
 }
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-body {
-  /* Use dynamic viewport units for mobile */
-  min-height: 100svh; /* fallbacks handled by browsers */
-  display: flex;
-  flex-direction: column;
-}
-
-main, .board-wrapper {
-  flex: 1;              /* take available space */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.board {
-  aspect-ratio: 1 / 1;          /* stay square */
-  width: min(95vw, 95svh);      /* fit to smallest dimension */
-}
-
-/* Force <main> to grow and center the board */
-main {
-  flex: 1;                  /* let it stretch vertically */
-  display: flex !important; /* override grid layout */
-  flex-direction: column;
-  justify-content: center;  /* vertical center */
-  align-items: center;      /* horizontal center */
-  margin-bottom: 0 !important;
-}
-
 
 </style>
 </head>
