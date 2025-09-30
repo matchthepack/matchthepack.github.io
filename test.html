@@ -405,6 +405,33 @@ input, select, textarea, button, label {
   pointer-events: none !important;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  /* Use dynamic viewport units for mobile */
+  min-height: 100svh; /* fallbacks handled by browsers */
+  display: flex;
+  flex-direction: column;
+}
+
+main, .board-wrapper {
+  flex: 1;              /* take available space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.board {
+  aspect-ratio: 1 / 1;          /* stay square */
+  width: min(95vw, 95svh);      /* fit to smallest dimension */
+}
+
+
 </style>
 </head>
 <body>
