@@ -439,7 +439,7 @@ input, select, textarea, button, label {
 <main>
   <aside class="panel">
     <h3 style="margin:6px 4px 10px">Dashboard</h3>
-    <div class="stats">
+    <div id="stats" class="stats">
       <div class="stat"><div class="label">Time</div><div id="time" class="val">00:00</div></div>
       <div class="stat"><div class="label">Moves</div><div id="moves" class="val">0</div></div>
       <div class="stat"><div class="label">Matches</div><div id="matches" class="val">0</div></div>
@@ -845,6 +845,7 @@ newBtn.addEventListener('click', e => {
     e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
     if (on) {
       //toggleStatsMobile
+       document.getElementById('stats').style.display = 'none';
        document.getElementById('toggleStatsMobile').style.display = 'none';
       document.getElementById('statsPanel').style.display = 'none';
       $('html, body').animate({ scrollTop: 0 }, 'fast');
